@@ -2,10 +2,17 @@
 ---------------------------------------------------------------------------
 Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 7/25/2024
-    Last updated at 5/24/2025
+    Last update date: 12/21/2025
+
+    ~~~~~~ adapted from meshCleanup.m ~~~~~~
 
 this script is for cleaning the mesh data, delete problematic cells after
 oufti automatic cell outline detection
+
+this version is specifically for phase images taken with SPT lens
+(loci tracking experiments with phase images)
+
+pixel size:     64.5 nm (phase) vs 160 nm (SPT) 
 ---------------------------------------------------------------------------
 %}
 
@@ -16,14 +23,15 @@ load( 'mesh.mat')
 
 
 % elimination criteria
-minArea = 300;  % minimal cell area (pixel)
-minWid = 10;    % minimal cell width (pixel)
-maxWid = 17;    % maximal cell width (pixel)
+minArea = 100;  % minimal cell area (pixel)
+maxArea = 200;  % maximal cell area (pixel)
+minWid = 6;     % minimal cell width (pixel)
+maxWid = 8.3;   % maximal cell width (pixel)
 
-
+    
 % set up cell mesh and remove bad cells
 nImg = size( cellListN, 2);
-cellAll = [];
+cellAll = cell( nImg, 1);
 
 for imgNum = 1: nImg % number of images
 
@@ -66,6 +74,13 @@ for imgNum = 1: nImg % number of images
             continue
         end
 
+        % find cells that are too big
+        if ( cellMesh( cellNum).area > maxArea)
+            badCells( cellNum) = true;
+            fprintf( '~~~~~~ Image %2d Cell #%-3d is too big ~~~~~~\n', imgNum, cellid( cellNum))
+            continue
+        end
+
         cellWid = cellMesh( cellNum).area/ cellMesh( cellNum).length;
         if cellWid < minWid || cellWid > maxWid
             badCells( cellNum) = true;
@@ -73,9 +88,9 @@ for imgNum = 1: nImg % number of images
             continue
         end
         
-        if imgNum == 2 && cellList.cellId{ imgNum}(cellNum) == 73
-            a = 1;
-        end
+        % if imgNum == 2 && cellList.cellId{ imgNum}(cellNum) == 73
+        %     a = 1;
+        % end
 
         % find curled cells
         movNum = 3;
@@ -104,7 +119,7 @@ for imgNum = 1: nImg % number of images
     cellList.cellId{ imgNum}( badCells) = [];
     
     cellMesh( badCells) = [];
-    cellAll = [ cellAll; cellMesh];
+    cellAll{ imgNum} = cellMesh;
 end
 
 % recalculate the cell number in each image
@@ -114,14 +129,15 @@ cellListN = cellfun( @length, cellList.cellId);
 save( 'mesha', 'p', 'rawPhaseFolder', 'cellList', 'cellListN', 'paramString', 'cellAll')
 
 fprintf( '\n~~~~~~ all images cleanup done ~~~~~~\n\n')
-    
+
+cellAll = vertcat( cellAll{:});
 
 % display the cell length & wid
 cellArea = vertcat( cellAll.area);
 cellLength = vertcat( cellAll.length);
 cellWid = cellArea./ cellLength;
-fprintf( '  ~~~ length: %.2f pix,  wid: %.2f pix,  %d cells  ~~~ \n',...
-    mean( cellLength), mean( cellWid), sum( cellListN)) 
+fprintf( '  ~~~ length: %.2f pix,  wid: %.2f pix,  area: %.2f pix,  %d cells  ~~~ \n',...
+    mean( cellLength), mean( cellWid), mean( cellArea), sum( cellListN)) 
 
 
 %% Function
