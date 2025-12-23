@@ -100,7 +100,7 @@ for m = combNum
     c = c + 1;
     
     % run spotNorm on an individual track
-    [ tfGood, cellMesh]= spotNorm_loci( trackList, phaseList, m, ...
+    [ tfGood, cellMesh] = spotNorm_loci( trackList, phaseList, m, ...
         cellList, cellListN, goodCellFlag, imgSaveFlag);
           
     cellNum = [ tfGood.cellNumber]';    % cell number of each good track
@@ -257,7 +257,7 @@ totalCells = max( cellNum);
     end
 
 % cell subregion constraints (cell pole or middle part)
-bound = poleBounds( cellNum); % cell pole bound for each track
+bound = poleBounds( cellNum);   % cell pole bound for each track
 tracksMid = false( nTracks, 2); % based on [first spot, whole track]
 
 LNorm = tracksLNorm; % [first spot, end spot, minLNorm, maxLNorm]
@@ -275,13 +275,14 @@ save( fullfile( lociPath, lociName), 'varPath', 'lociPath', 'dataPath', 'imgPath
     'maxT', 'timeStep', 'cellNum', 'totalCells', ...
     'nTracks', 'EnsMSD', 'EnsTAMSD', 'fitTxt', 'alpha', 'Dalpha', 'posStd', ...
     'tracksAmp', 'tracksOrigin', 'tracksLength', 'tracksFrame', ...% 'steps', ...    
-    'cellInfo', 'poleBounds', 'tracksLNorm', 'tracksxNorm', 'tracksMid', 'tracksMid40', ...
+    'cellInfo', 'poleBounds', 'tracksLNorm', 'tracksxNorm', 'tracksMid', ...
+    'tracksLNorm40', 'tracksxNorm40', 'tracksMid40', ...
     'folderName', 'expDate', 'strain', 'extraName', 'tfPath', 'tfName', 'lociName')
 
 
 fprintf( ' ~~~ Loci file:  %s saved under  ''lociPath'' ~~~\n\n', lociName)
 
-cd( lociPath)
+% cd( lociPath)
 
 
 %% 3. Display analysis result summary
