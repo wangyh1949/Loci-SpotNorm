@@ -8,14 +8,14 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
 
 
 
-## Major scripts
+### Major scripts
 
 - `lociAnalysis_spotNorm.m`: combine oufti & uTrack, run spotNorm, diffusion analysis, save tf & Loci files
 - `plot_spotNorm.m`: plot xNorm & lNorm from the data
 
 
 
-## Before Running the Code
+### Before Running the Code
 
 1. change current working directory to the folder that contains `tracking00x` folders (uTrack output) and `mesha.mat` (oufti output)
 2. change `varPath` to your own local folder to store analysis results (all results will be saved under the `lociPath`)
