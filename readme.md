@@ -1,6 +1,6 @@
 ## About
 
-This repo analyze the loci tracking data by combining the output from oufti & u-track. It calculates the normalized position of foci, and does diffusion analysis for tracks.
+This repo analyze the loci tracking data by combining the output from oufti & u-track. It calculates the normalized position (spotNorm) of foci, and does diffusion analysis for tracks.
 
 All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (pixel=160nm)
 - imaging setting: YFP_yh, 5mW 514nm, 20-200ms, 101 frames, Gain 3, 300x, angle=8400
@@ -10,7 +10,9 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
 
 ### Major scripts
 
+- `lociPrepare_spotNorm.m`: prepares the raw loci tracking data to be ready for uTrack/oufti analysis. 
 - `lociAnalysis_spotNorm.m`: combine oufti & uTrack, run spotNorm, diffusion analysis, save tf & Loci files
+- `meshCleanup_andor.m`: clean up the cell meshes with abnormal cell size and shape
 - `plot_spotNorm.m`: plot xNorm & lNorm from the data
 
 
@@ -21,24 +23,75 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
 2. change `varPath` to your own local folder to store analysis results (all results will be saved under the `lociPath`)
 3. make sure the oufti output file `mesh.mat` is cleaned up and saved as `mesha.mat`
 
-## 
-
-#### Raw data
-
-- time-lapse fluorescent images of gene loci
-- phase contrast images of cells for each FOV
 
 
+## Folder structure
 
-#### u-track analysis parameters
+This is the local folder created by `lociPrepare_spotNorm.m`. the folder is used to save analysis results and is named according to the hard drive folder containing raw ND2 data.
+
+```text
+251108-SK731/
+├── phase/
+│   ├── epi001.tif
+│   ├── ...
+│   └── epi00x.tif
+├── tracking001/
+├── ...
+├── tracking00x/
+```
+
+This is the folder structure after running oufti & u-track analysis. oufti results are saved under the folder as `mesh.mat`. u-track results are saved inside each `tracking00x` folder. `mesha.mat` are saved by `meshCleanup_andor.m` based on `mesh.mat`
+
+```text
+251108-SK731/
+├── phase/
+│   ├── epi001.tif
+│   ├── ...
+│   └── epi00x.tif
+├── tracking001/
+│   ├── backups/
+│   ├── TrackingPackage/
+|		├── GaussianMixtureModels/
+|			└── Channel_1_detection_result.mat
+│       └── tracks/
+|			└── Channel_1_tracking_result.mat
+|   └── movieData.mat
+├── ...
+├── tracking00x/
+├── mesh.mat
+└── mesha.mat
+```
+
+
+
+## Running workflow
+
+1. When capturing images using the NIS Element, follow naming rules
+   1. folder name: `date-strain extra` (i.e. `260101-SK1 Gly`, `extra` is optional)
+   2. tracking file: `tracking0xx.nd2` (xx: 001-099)
+   3. phase contrast images: `epi0xx.nd2` 
+2. Export ND2 files to Tiff files in NIS Element (follow instruction)
+   1. all phase contrast images should be exported into one folder (same as input)
+   2. all tracking images should be exported into individual subfolder
+3. Transfer the data to the hard drive
+4. Run `lociPrepare_spotNorm.m` to prepare files for oufti & u-track analysis
+5. Run oufti analysis using the parameter file `phase_SPT_alvin.set`
+   1. save the output file `mesh.mat` inside the data folder 
+6. Run u-track analysis using the parameters below
+   1. save the output file the same as the input folder (tracking00x)
+7. Run `lociAnalysis_spotNorm.m` to combine oufti & uTrack results, and for further spotNorm & diffusion analysis (results will be saved under the `lociPath`)
+8. Run plotting scripts to visualize the analysis results
+
+
+
+### Parameters
+
+#### u-track analysis
 
 - std = 1 pix, alpha = 0.01, alpha = 0.01
 - frame 0 gap, 40+ frame
 - 20ms exposure, 200ms interval, search radius = 2 pix
 
-
-
-#### oufti analysis parameter
+#### oufti analysis
 
 - `Phase_SPT_alvin.set`, post processed by `meshCleanup_andor.m`
-
