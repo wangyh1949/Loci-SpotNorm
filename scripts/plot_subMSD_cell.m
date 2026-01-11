@@ -140,7 +140,7 @@ function plotNum = getPlotNum( list)
         for k = 1:length( list)
             disp( ['  ' num2str(k) '. ' list(k).name])
         end
-        tmp = string( input( '\nWhich files do you want to plot (like: 1 3 4): ', 's')); % just input: 1 3 4 5
+        tmp = string( input( '\nWhich file do you want to plot:  ', 's')); % just input: 1 3 4 5
         % plotNum = double( regexp( tmp, '\d+', 'match')); % find all numbers but not extra space
         plotNum = sscanf( tmp, '%d')'; % parses any valid number format
         

@@ -42,6 +42,7 @@ for imgNum = 1: nImg % number of images
     nCell = size( meshData, 1); % number of cells
 
     if nCell == 0  % in case no cell are detected
+        warning( '~~~~~~ Image %2d have no cell mesh ~~~~~~\n', imgNum)
         continue
     end
     
