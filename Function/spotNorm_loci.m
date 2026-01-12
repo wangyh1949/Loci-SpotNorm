@@ -440,7 +440,7 @@ end
             meshMid = cellMesh( thisCell).meshMid;
             lenCum = [0; cellMesh( thisCell).gridLenCum]; % to match the mesh index
             
-%             spotPosInCell = nan( nFrames, 2); % absolute position inside cell
+            spotPosInCell = nan( nFrames, 2); % absolute position inside cell
             spotPosNorm = nan( nFrames, 2); % normalized position inside cell
             
             for frame = 1: nFrames
@@ -500,7 +500,7 @@ end
 %                 xNorm = max( -1, min( 1, xNorm)); % set range at [-1 1]
 %                 lNorm = max( 0, min( 1, lNorm)); % set range at [0 1]
                 
-%                 spotPosInCell( frame,:) = [lPos, xPos];
+                spotPosInCell( frame,:) = [lPos, xPos];
                 spotPosNorm( frame,:) = [lNorm, xNorm];
                 
                 %% Check by plotting points & lines & intersections
@@ -539,7 +539,7 @@ end
                 end
             end
 
-%             tfGood(i).spotPosInCell = spotPosInCell; % absolute position inside cell
+            tfGood(i).spotPosInCell = spotPosInCell; % absolute position inside cell
             tfGood(i).spotPosNorm = spotPosNorm; % normalized position inside cell
         end
 %         disp( '        spotNorm Finished ~~~');
