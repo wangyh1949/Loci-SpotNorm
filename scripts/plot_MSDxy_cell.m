@@ -8,6 +8,11 @@ Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
 Description: This code calculates the MSD along cellular long & short axes
     for loci data that have been spot-normalized.
 
+It makes two plots:
+    1. MSD along cell short axis (x)
+    2. MSD along cell long axis (L/y)
+
+data from multiple strains are overlaied on top of each other
 ---------------------------------------------------------------------------
 %}
 
@@ -26,8 +31,8 @@ tfFile = dir( fullfile( tfPath, ['tf oufti*']));
 plotNum = getPlotNum( tfFile);
 
 % set up figures
-f1 = figure( 'Position', [300 400 400 380]);
-f2 = figure( 'Position', [710 400 400 380]);
+f1 = figure( 'Position', [300 550 400 270]);
+f2 = figure( 'Position', [710 550 400 280]);
 colorList = get( gca,'colororder');  colorList = repmat( colorList, [2, 1]);
 
 % set up strain name info
@@ -55,7 +60,7 @@ for i = plotNum
     tl = cellfun( @length, {tracksFinal.amp}');
     cond = ( tl >= minTL);
 
-    maxT = max( tl); plotRange = 1: maxT-1;
+    maxT = max( tl); plotRange = 1: minTL;
 
     % preallocate for MSD
     EnsMSDx = nan( nTracks, maxT-1);    EnsTAMSDx = nan( nTracks, maxT-1);
@@ -85,17 +90,17 @@ for i = plotNum
     time = (1: maxT-1)* timeStep;
 
     % set legend text
-    legtxt = sprintf( '%s%s', strain, extraName); 
-    legtxt2 = sprintf( '%s', strainName);
+    legtxt = sprintf( '%s, %s', strain, expDate); 
+    legtxt2 = sprintf( '%s,%s', strainName, extraName);
 
     % plot EATA-MSD for x Pos
     figure( f1)
-    scatter( time( plotRange), eataMSDx( plotRange), 30, 'filled', 'MarkerFaceColor', colorList(c,:), ...
+    scatter( time( plotRange), eataMSDx( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(c,:), ...
         'DisplayName', legtxt), hold on
 
     % plot EATA-MSD for L/y Pos
     figure( f2)
-    scatter( time( plotRange), eaMSDy( plotRange), 30, 'filled', 'MarkerFaceColor', colorList(c,:), ...
+    scatter( time( plotRange), eataMSDy( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(c,:), ...
         'DisplayName', legtxt2), hold on
 
 end
@@ -108,7 +113,7 @@ end
 figure( f1), set( gca, 'LineWidth', 1, 'FontSize', 14)
 xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
 legend( 'Location', 'southeast', 'box', 'off', 'FontSize', 10)
-title( sprintf( 'MSD in x (%d+f)', minTL), 'FontSize', 14)
+title( sprintf( 'Transverse MSD-x (%d+f)', minTL), 'FontSize', 14)
 set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
 xlim( limX), ylim( limY)
 
@@ -117,7 +122,7 @@ xlim( limX), ylim( limY)
 figure( f2), set( gca, 'LineWidth', 1, 'FontSize', 14)
 xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
 legend( 'Location', 'southeast', 'box', 'off', 'FontSize', 10)
-title( sprintf( 'MSD in L/y (%d+f)', minTL), 'FontSize', 14)
+title( sprintf( 'Longitudinal MSD-L (%d+f)', minTL), 'FontSize', 14)
 set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
 xlim( limX), ylim( limY)
 
@@ -167,7 +172,7 @@ function [limX, limY] = findLim( timeStep, strain)
     if timeStep == 1
         limX = [0.8 100]; limY = [5e-3 0.1]; % 100-1000ms
     elseif timeStep == 0.2
-        limX = [0.1 20]; limY = [1e-3 0.05]; % 20-200ms
+        limX = [0.1 20]; limY = [1e-3 0.03]; % 20-200ms
         if strcmp( strain, 'SK311')
             limX = [0.1 30]; limY = [1e-3 0.1]; % 20-200ms, with SK311
         end
