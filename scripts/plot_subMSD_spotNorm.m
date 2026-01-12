@@ -2,7 +2,7 @@
 ---------------------------------------------------------------------------
 Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 1/8/2026
-    Last update date: 1/8/2026
+    Last update date: 1/12/2026
 
     ~~~~~~ adapted from plot_subMSD_cell.m ~~~~~~
 
@@ -33,15 +33,13 @@ strainList = { 727 728 729 730 731 734 701 662 311 725};
 nameList = { 'araC' 'Ter' 'Ori' 'Right' 'Left' 'LacZ'... %'12tetO@LacZ' ...
     '6tetO@LacY' '6tetO@lacZ' '140tetO pJZ133' '140tetO@lacZ'};
 
-
-% set up figures
-f1 = figure( 'Position', [300 400 400 380]);
-f2 = figure( 'Position', [710 400 400 380]);
-
 minTL = 90; % minimal trackLength for plotting
+cc = 0;
 
 for j = plotNum
-        
+
+    cc = cc + 1;
+
     % load loci file
     load( fullfile( lociList( j).folder, lociList( j).name))
     
@@ -71,6 +69,10 @@ for j = plotNum
     
     colorList = flip( winter( numel( binPer))); c = 0; 
 
+    % create figures
+    f1 = figure; set( f1, 'Position', [300+20*cc 500+20*cc 400 270])
+    f2 = figure; set( f2, 'Position', [810+20*cc 500+20*cc 400 270])
+
     for k = 1: numel( binList)- 1
     
         c = c + 1;
@@ -93,37 +95,37 @@ for j = plotNum
         
         % 1. plot EA-MSD
         figure( f1)
-        scatter( time( plotRange), eaMSD( plotRange), 30, 'filled', 'MarkerFaceColor', colorList(c,:), ...
+        scatter( time( plotRange), eaMSD( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(c,:), ...
             'DisplayName', legtxt), hold on
 
         % 2. plot EATA-MSD
         figure( f2)
         scatter( time( plotRange), eataMSD( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(c,:), ...
             'DisplayName', legtxt), hold on
-    end                
+    end
+
+
+    % Figure Setting    
+    [limX, limY] = findLim( timeStep, strain);
+        % limY = 'auto';
+    
+    % 1. EA-MSD
+    figure( f1), set( gca, 'LineWidth', 1, 'FontSize', 14)
+    xlabel( 'Time (s)'), ylabel( 'EA-MSD (µm^2)')
+    legend( 'Location', 'best', 'box', 'off', 'FontSize', 8)
+    title( sprintf( '%s %s (%s, %d+f)', strain, strainName, expDate, minTL), 'FontSize', 14)
+    set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
+    xlim( limX), ylim( limY)
+    
+    
+    % 2. EATA-MSD
+    figure( f2), set( gca, 'LineWidth', 1, 'FontSize', 14)
+    xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
+    legend( 'Location', 'best', 'box', 'off', 'FontSize', 8)
+    title( sprintf( '%s %s (%s)', strain, strainName, expDate), 'FontSize', 14)
+    set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
+    xlim( limX), ylim( limY)
 end
-
-
-%% Figure Setting
-
-[limX, limY] = findLim( timeStep, strain);
-
-% 1. EA-MSD
-figure( f1), set( gca, 'LineWidth', 1, 'FontSize', 14)
-xlabel( 'Time (s)'), ylabel( 'EA-MSD (µm^2)')
-legend( 'Location', 'southeast', 'box', 'off', 'FontSize', 10)
-title( sprintf( '%s-%s %s (%d+f)', expDate, strain, strainName, minTL), 'FontSize', 14)
-set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
-xlim( limX), ylim( limY)
-
-
-% 2. EATA-MSD
-figure( f2), set( gca, 'LineWidth', 1, 'FontSize', 14)
-xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
-legend( 'Location', 'southeast', 'box', 'off', 'FontSize', 10)
-title( sprintf( '%s-%s %s (EATA)', expDate, strain, strainName), 'FontSize', 14)
-set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
-xlim( limX), ylim( limY)
 
 
 
@@ -140,9 +142,7 @@ function plotNum = getPlotNum( list)
         end
         tmp = string( input( '\nWhich files do you want to plot (like: 1 3 4): ', 's')); % just input: 1 3 4 5
         % plotNum = double( regexp( tmp, '\d+', 'match')); % find all numbers but not extra space
-        plotNum = sscanf( tmp, '%d')'; % parses any valid number format
-        
-        plotNum = plotNum(1); % only plot one file
+        plotNum = sscanf( tmp, '%d')'; % parses any valid number format        
     end
     
 fprintf( '\n')
