@@ -29,8 +29,6 @@ nameList = { 'araC' 'Ter' 'Ori' 'Right' 'Left' 'LacZ'... %'12tetO@LacZ' ...
 
 
 xNormBin = 0.04; lNormBin = 0.02; % for spotNorm plotting for all timePoints
-xNormStat = nan( length( plotNum), 2);
-labelName = cell( length( plotNum), 1);
 
     set( figure(1), 'Position', [600 450 400 380]) % for xNorm
     set( figure(2), 'Position', [1010 450 400 380]) % for lNorm
@@ -46,10 +44,10 @@ for j = plotNum
     % load lociPos file
     load( fullfile( lociList( j).folder, lociList( j).name))
 
-    index = find( strcmp( string( strainList), strain(3:end)));
-    if isempty( index), strainName = [ strain extraName];
-    else, strainName = [ nameList{ index} extraName]; end
-
+    % find strain name
+    index = find( strcmp( string( strainList), strain(3:end)));    
+    if isempty( index), strainName = strain;
+    else, strainName = nameList{ index}; end
 
     % count spot number for each cell
     cellSpots = accumarray( cellNum(:), 1, [totalCells, 1]);
@@ -119,7 +117,7 @@ ylim( [0 0.13])
 figure(2)
 set( gca, 'FontSize', 14, 'Xtick', 0:0.2:1, 'LineWidth', 1)
 xlabel([ '|0.5-LNorm|, bin=' num2str( lNormBin)]), ylabel( 'Probability')
-
-legend( 'Location', 'southeast', 'box', 'off', 'FontSize', 11)
+legend( 'Location', 'northeast', 'box', 'off', 'FontSize', 11)
+% legend( 'Location', 'best', 'box', 'off', 'FontSize', 11)
 title( sprintf( 'Cell with %s', extra))
 xlim([0 0.5])

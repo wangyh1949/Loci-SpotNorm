@@ -20,7 +20,7 @@ this script is specifically for loci tracking experiments with cell images
 
 clear, clc, close all
 
-% set the path to store analysis results
+% set the path for storing analysis results
 varPath = 'C:\Users\yuhuanw2\Documents\MATLAB\Lab Data\Track and Cell Variables\';
 lociPath = fullfile( varPath, 'Loci SpotNorm'); % subfolder under varPath
 
