@@ -30,6 +30,11 @@ f1 = figure( 'Position', [300 400 400 380]);
 f2 = figure( 'Position', [710 400 400 380]);
 colorList = get( gca,'colororder');  colorList = repmat( colorList, [2, 1]);
 
+% set up strain name info
+strainList = { 727 728 729 730 731 734 701 662 311 725};
+nameList = { 'araC' 'Ter' 'Ori' 'Right' 'Left' 'LacZ'... %'12tetO@LacZ' ...
+    '6tetO@LacY' '6tetO@lacZ' '140tetO pJZ133' '140tetO@lacZ'};
+
 
 minTL = 90; % minimal trackLength for MSD calculation
 c = 0;
@@ -39,6 +44,11 @@ for i = plotNum
     c = c + 1;
     % load the trackFinal file
     load( fullfile( tfPath, tfFile(i).name)),  fprintf( '    ~~~ %s loaded ~~~\n', tfName)
+    
+        % find strain name
+        index = find( strcmp( string( strainList), strain(3:end)));    
+        if isempty( index), strainName = strain;
+        else, strainName = nameList{ index}; end
 
     nTracks = numel( tracksFinal);
 
@@ -54,9 +64,9 @@ for i = plotNum
     for j = find( cond)'
         
         % get spot positions in cell coordinates
-        LPos = tracksFinal(j).spotPosInCell(:,1);
-        xPos = tracksFinal(j).spotPosInCell(:,2);
-
+        xPos = tracksFinal(j).spotPosInCell(:,2)* pixelSize* 1e6; % unit: um
+        LPos = tracksFinal(j).spotPosInCell(:,1)* pixelSize* 1e6; % unit: um
+        
         [ EnsMSDx( j,:), EnsTAMSDx( j,:)] = getMSD( xPos, maxT);
         [ EnsMSDy( j,:), EnsTAMSDy( j,:)] = getMSD( LPos, maxT);
 
@@ -76,6 +86,7 @@ for i = plotNum
 
     % set legend text
     legtxt = sprintf( '%s%s', strain, extraName); 
+    legtxt2 = sprintf( '%s', strainName);
 
     % plot EATA-MSD for x Pos
     figure( f1)
@@ -85,7 +96,7 @@ for i = plotNum
     % plot EATA-MSD for L/y Pos
     figure( f2)
     scatter( time( plotRange), eaMSDy( plotRange), 30, 'filled', 'MarkerFaceColor', colorList(c,:), ...
-        'DisplayName', legtxt), hold on
+        'DisplayName', legtxt2), hold on
 
 end
 
@@ -95,7 +106,7 @@ end
 
 % 1. EATA-MSDx
 figure( f1), set( gca, 'LineWidth', 1, 'FontSize', 14)
-xlabel( 'Time (s)'), ylabel( 'EATA-MSDx (µm^2)')
+xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
 legend( 'Location', 'southeast', 'box', 'off', 'FontSize', 10)
 title( sprintf( 'MSD in x (%d+f)', minTL), 'FontSize', 14)
 set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
@@ -104,9 +115,9 @@ xlim( limX), ylim( limY)
 
 % 2. EATA-MSDy
 figure( f2), set( gca, 'LineWidth', 1, 'FontSize', 14)
-xlabel( 'Time (s)'), ylabel( 'EATA-MSDy (µm^2)')
+xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
 legend( 'Location', 'southeast', 'box', 'off', 'FontSize', 10)
-title( sprintf( 'MSD in y (%d+f)', minTL), 'FontSize', 14)
+title( sprintf( 'MSD in L/y (%d+f)', minTL), 'FontSize', 14)
 set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
 xlim( limX), ylim( limY)
 
@@ -156,7 +167,7 @@ function [limX, limY] = findLim( timeStep, strain)
     if timeStep == 1
         limX = [0.8 100]; limY = [5e-3 0.1]; % 100-1000ms
     elseif timeStep == 0.2
-        limX = [0.1 20]; limY = [4e-3 0.06]; % 20-200ms
+        limX = [0.1 20]; limY = [1e-3 0.05]; % 20-200ms
         if strcmp( strain, 'SK311')
             limX = [0.1 30]; limY = [1e-3 0.1]; % 20-200ms, with SK311
         end
