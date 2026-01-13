@@ -11,17 +11,20 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
 ### Major scripts
 
 - `lociPrepare_spotNorm.m`: prepares the raw loci tracking data to be ready for uTrack/oufti analysis. 
-- `lociAnalysis_spotNorm.m`: combine oufti & uTrack, run spotNorm, diffusion analysis, save tf & Loci files
-- `meshCleanup_andor.m`: clean up the cell meshes with abnormal cell size and shape
-- `plot_spotNorm.m`: plot xNorm & lNorm from the data
+- `lociAnalysis_spotNorm.m`: combine oufti & uTrack, run spotNorm, diffusion analysis, save `tf oufti` & `Loci oufti` files.
+  - this scripts call function: `spotNorm_loci`, `reNumCells_yh`, `setCameraGain`, `getCellInfo`.
+- `lociCombine_spotNorm.m`: combines multiple single-day analysis files saved by `lociAnalysis_spotNorm.m`.
+- `meshCleanup_andor.m`: clean up the cell meshes with abnormal cell size and shape.
+- `plot_spotNorm.m`: plot xNorm & lNorm from the data.
+- `plot_MSD_fit.m`: plot MSD & fitting of the tracking data.
 
 
 
 ### Before Running the Code
 
-1. change current working directory to the folder that contains `tracking00x` folders (uTrack output) and `mesha.mat` (oufti output)
-2. change `varPath` to your own local folder to store analysis results (all results will be saved under the `lociPath`)
-3. make sure the oufti output file `mesh.mat` is cleaned up and saved as `mesha.mat`
+1. Change current working directory to the folder that contains `tracking00x` folders (uTrack output) and `mesha.mat` (oufti output).
+2. Always change `varPath` in the code to your own local folder to store analysis results (all results will be saved under the `lociPath`).
+3. Make sure the oufti output file `mesh.mat` is cleaned up and saved as `mesha.mat`.
 
 
 
@@ -40,7 +43,7 @@ This is the local folder created by `lociPrepare_spotNorm.m`. the folder is used
 ├── tracking00x/
 ```
 
-This is the folder structure after running oufti & u-track analysis. oufti results are saved under the folder as `mesh.mat`. u-track results are saved inside each `tracking00x` folder. `mesha.mat` are saved by `meshCleanup_andor.m` based on `mesh.mat`
+This is the folder structure after running oufti & u-track analysis. oufti results are saved under the folder as `mesh.mat`. u-track results are saved inside each `tracking00x` folder. `mesha.mat` are saved by `meshCleanup_andor.m` based on `mesh.mat`.
 
 ```text
 251108-SK731/
@@ -81,10 +84,11 @@ This is the folder structure after running oufti & u-track analysis. oufti resul
    1. save the output file the same as the input folder (tracking00x)
 7. Run `lociAnalysis_spotNorm.m` to combine oufti & uTrack results, and for further spotNorm & diffusion analysis (results will be saved under the `lociPath`)
 8. Run plotting scripts to visualize the analysis results
+9. (optional) To combine multiple single-day results, run `lociCombine_spotNorm`. It will combined single-day `tf oufti` & `Loci oufti` files and move the individual files to the `single day` subfolder. 
 
 
 
-### Parameters
+## Analysis Parameters
 
 #### u-track analysis
 
