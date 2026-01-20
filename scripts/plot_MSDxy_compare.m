@@ -1,7 +1,7 @@
 %{
 Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 1/12/2026
-    Last update date: 1/12/2026
+    Last update date: 1/19/2026
 
     ~~~~~~~ adapted from plot_MSDxy_cell.m ~~~~~~~
 
@@ -37,23 +37,28 @@ nameList = { 'araC' 'Ter' 'ori' 'right' 'left' 'lacZ'... %'12tetO@LacZ' ...
 
 
 minTL = 90; % minimal trackLength for MSD calculation
+fitR = 1:40;    fitTxt = sprintf( '%d:%d fit', min( fitR), max( fitR));
 c = 0;
 
 for i = plotNum
 
     c = c + 1;
     % load the trackFinal file
-    load( fullfile( tfPath, tfFile(i).name)),  fprintf( '    ~~~ %s loaded ~~~', tfName)
+    load( fullfile( tfPath, tfFile(i).name))%,  fprintf( '    ~~~ %s loaded ~~~', tfName)
     
         % find strain name
         index = find( strcmp( string( strainList), strain(3:end)));    
         if isempty( index), strainName = strain;
         else, strainName = nameList{ index}; end
+
         
     nTracks = numel( tracksFinal);
 
     tl = cellfun( @length, {tracksFinal.amp}');
     cond = ( tl >= minTL);
+
+        fprintf( '   plotting %d+ frames,  %d/%d tracks     [%s]\n', ...
+            minTL, sum( cond), nTracks, tfName)
 
     maxT = max( tl); plotRange = 1: minTL;
 
@@ -80,8 +85,7 @@ for i = plotNum
 
     % determine frame time (timeStep) for the movie
     frameT = str2double( erase( regexp( extraName, '\d+ms', 'match', 'once'), 'ms'));
-    timeStep = frameT* 1e-3; % unit: s    
-    fprintf( '        ~~~~ frame time is  %d ms ~~~~\n', timeStep*1e3)
+    timeStep = frameT* 1e-3; % unit: s
     time = (1: maxT-1)* timeStep;
 
 
@@ -91,29 +95,36 @@ for i = plotNum
 
     % set up figures
     figure, set( gcf, "Position", [410*c-110 550 400 270])
+    colorList = get( gca,'colororder');
 
-    % plot EATA-MSD for x Pos
-    scatter( time( plotRange), eataMSDx( plotRange), 20, 'filled', 'DisplayName', 'transverse x'), hold on
+    % 1. plot EATA-MSD for x Pos
+    scatter( time( plotRange), eataMSDx( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(1,:), ...
+     'HandleVisibility', 'off', 'DisplayName', 'transverse x'), hold on
+    
+        [Dapp, alphaFit] = plotFitLinear( time, eataMSDx, fitR, colorList(1,:));
+        fprintf( '        x: Dapp= %.2e, alpha= %.2f\n', Dapp,  alphaFit);
 
-    % plot EATA-MSD for L/y Pos
-    scatter( time( plotRange), eataMSDy( plotRange), 20, 'filled', 'DisplayName', 'longitudinal L')
+    % 2. plot EATA-MSD for L/y Pos
+    scatter( time( plotRange), eataMSDy( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(2,:), ...
+     'HandleVisibility', 'off', 'DisplayName', 'longitudinal L')
+
+        [Dapp, alphaFit] = plotFitLinear( time, eataMSDy, fitR, colorList(2,:));
+        fprintf( '        L: Dapp= %.2e, alpha= %.2f\n\n', Dapp,  alphaFit);
+
 
     % figure setting
-    [limX, limY] = findLim( timeStep, strain);
-
-    % 1. EATA-MSDx
     figure( gcf), set( gca, 'LineWidth', 1, 'FontSize', 14)
     xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
     legend( 'Location', 'southeast', 'box', 'off', 'FontSize', 12)
     title( sprintf( '%s %s (%s, %d+f)', strain, strainName, expDate, minTL), 'FontSize', 14)
     set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
+    [limX, limY] = findLim( timeStep, strain);
     xlim( limX), ylim( limY)
-
 end
 
 
 
-%% function
+%% Function
 
 function plotNum = getPlotNum( list)
 
@@ -149,6 +160,19 @@ function [ EnsMSD, EnsTAMSD] = getMSD( traj, maxT)
         dr2 = sum( dr.^2, 2);
         EnsTAMSD(tau) = mean( dr2, 'omitnan'); % ensemble TA-MSD for EATA-MSD plotting
     end    
+end
+
+
+function [Dapp, alphaFit] = plotFitLinear( time, eataMSD, fitR, lineColor)
+
+        % linear fit
+        f = polyfit( log( time( fitR)), log( eataMSD( fitR)), 1);
+        alphaFit = f(1);    Dapp = exp( f(2))/4; 
+        t = time( fitR);   MSDFit =  4* Dapp* t.^ alphaFit;
+
+        % plot fitting line
+        plot( t, MSDFit, 'LineWidth', 1, 'color', lineColor, ...
+            'DisplayName', sprintf( 'x: D\\alpha=%.1e, \\alpha=%.2f', Dapp, alphaFit))
 end
 
 
