@@ -31,15 +31,15 @@ uTrack analysis results
 
 clear, clc, close all
  
-lociPath = uigetdir( 'E:\2025', 'Please choose the hard drive folder that contains raw tracking data');
-[~, folderName] = fileparts( lociPath); % get the raw data folder name
+% lociPath = uigetdir( 'E:\2025', 'Please choose the hard drive folder that contains raw tracking data');
+% [~, folderName] = fileparts( lociPath); % get the raw data folder name
 
-% folderName = '251108-SK731 rif'; % folderName for the tracking experiment
-% lociPath = fullfile( 'E:\2025\', folderName); % folder containing expermental data (on a hard drive)
+folderName = '260115-SK892'; % folderName for the tracking experiment
+lociPath = fullfile( 'F:\2026\', folderName); % folder containing expermental data (on a hard drive)
 
 % corresponding uTrack output folder on the computure
 % change to your own local folder that stores the analysis results
-dataPath = [ 'C:\Users\yuhuanw2\Documents\MATLAB\Lab Data\2025\' folderName];
+dataPath = [ 'C:\Users\yuhuanw2\Documents\MATLAB\Lab Data\2026\' folderName];
 
 tmp = dir( fullfile( lociPath, '*racking*'));
 % tmp = dir( fullfile( lociPath, '*\*racking*'); % for tracking folders are in some subfolder

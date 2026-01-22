@@ -61,8 +61,9 @@ for j = plotNum
         time = (1: maxTau)* timeStep;
 
     % divide data by spotNorm value
-    binData = abs( mean( tracksxNorm40, 2));  binName = '|xNorm|';
+    binData = abs( mean( tracksxNorm40, 2));  binName = '|xNorm|'; % average of first 40 frames
     % binData = abs( mean( tracksLNorm40, 2)-0.5);  binName = 'LNorm';
+    % binData = abs( tracksxNorm(:,1));  binName = '|xNorm|'; % xNorm of first spot
 
     binPer = [0 0.2 0.4 0.6 0.8 1]; % binning percentage
     binList = quantile( binData, binPer); 

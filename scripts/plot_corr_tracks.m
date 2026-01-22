@@ -4,8 +4,8 @@ Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 1/21/2026
     Last update date: 1/21/2026
 
-Description: This script plot the correlation of MSD(1) & spotNorm, each
-track as one data point
+Description: This script plot the correlation of any two track quantities
+(such as amplitude, spotNorm, cellLength), each track as one data point
 
 It makes 1 plots with scatter points for each datasets 
 
@@ -54,13 +54,18 @@ for j = plotNum
     % count spot number for each cell
     cellSpots = accumarray( cellNum(:), 1, [totalCells, 1]);
 
+    % extract spotNorm variables
+    xxNorm = tracksxNorm(:,1);   xNorm40 = tracksxNorm40;
+    llNorm = tracksLNorm(:,1);   lNorm40 = tracksLNorm40;
+    mid = tracksMid(:,1);       mid40 = tracksMid40;
+    % tracksMid: [first spot, whole track]
+
     % extract MSD variables
     msd1 = EnsMSD(:, 1); % ensemble MSD(1)
     tamsd1 = EnsTAMSD(:, 1); % time-averaged MSD(1)
-    
+
     % extract amplitude variables
     amp = tracksAmp(:,1); % take amplitude at first frame
-    % amp = mean( tracksAmp(:,1:40), 2); % average amplitude of first 40 frames
 
     % ~~~~~~~~ Condition ~~~~~~~~~
 
@@ -75,20 +80,30 @@ for j = plotNum
         % goodCells = find( cellSpots == 2);   extra = '2 spots';
         condSpots = ismember( cellNum, goodCells); % flag for spots in selected cells
     
+        % 3. cap region condition
+        condxNorm = all( mid40, 2); % exclude tracks with any cap points
+
         % ~~~~ final condition ~~~~
-        % cond = condTracks & condSpots;
+        % cond = condTracks & condSpots & condxNorm;
         cond = true( numel( tl), 1); % include all tracks
 
         fprintf( '   %d/%d cells,   %d/%d tracks    %s\n', ...
             numel( goodCells), totalCells, sum( cond), nTracks, lociName)
         % fprintf( '     condTracks:  %d/%d tracks\n', sum( condTracks), nTracks)
         % fprintf( '     condSpots:   %d/%d tracks\n', sum( condSpots), nTracks)
+        % fprintf( '     condxNorm:   %d/%d tracks (no cap points)\n\n', sum( condxNorm), nTracks)
+
+    xPos = xxNorm.* [cellInfo( cellNum).width]'*1e6; % absolute x position, unit: um
 
 
-        % select x and y for plotting
-        x = amp( cond);    xlabelTxt = 'amplitude (a.u.)';
+    % select x and y for plotting
+
+        % x = abs( xxNorm( cond));    xlabelTxt = '|xNorm|';
         % x = abs( xPos( cond));      xlabelTxt = '|xPos| (µm)';
-        y = tamsd1( cond);
+        x = [ cellInfo( cellNum).length]'*1e6;  xlabelTxt = 'cell length (µm)';
+
+        % y = abs( xxNorm( cond));    ylabelTxt = '|xNorm|';
+        y = tamsd1( cond);          ylabelTxt = 'MSD(1) (µm^2)';
     
     % plot scatter 
     scatter( x, y, 20, 'filled', 'MarkerFaceAlpha', 0.1, 'DisplayName', legtxt), hold on
@@ -99,7 +114,7 @@ for j = plotNum
 
     % figure setting
     figure( gcf), set( gca, 'FontSize', 14)
-    xlabel( xlabelTxt), ylabel( 'MSD(1) (µm^2)')
+    xlabel( xlabelTxt), ylabel( ylabelTxt)
     legend( 'Location', 'northeast', 'box', 'off', 'FontSize', 12)
     title( legtxt2)
 end

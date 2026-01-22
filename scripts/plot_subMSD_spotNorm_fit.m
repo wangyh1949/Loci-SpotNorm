@@ -110,7 +110,7 @@ for j = plotNum
         
             % linear fit
             f = polyfit( log( time( fitR)), log( eataMSD( fitR)), 1);
-            alphaFit = f(1);    DFit = exp( f(2))/4; DFitList(c) = DFit;
+            alphaFit = f(1);    DFit = exp( f(2))/4;    DFitList(c) = DFit;
             t = time( fitR);   MSDFit =  4* DFit* t.^ alphaFit;
             fprintf( '       EATA fit: D = %.1e,  alpha = %.2f\n', DFit, alphaFit) % print fit result
     end

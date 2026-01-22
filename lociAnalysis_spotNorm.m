@@ -63,6 +63,7 @@ dataPath = pwd; % current folder with raw uTrack & oufti output
             fprintf( '%3d. %s\n', k, trackList( k).name)
         end    
         combNum = input( '\nWhich tracks do you want to combine (0: all, or like: 3:7):   ');
+        % combNum = 0;
         if combNum == 0, combNum = 1: listN; end
     end
 
@@ -120,7 +121,7 @@ for m = combNum
     cellMeshComb{ c} = cellMesh( goodCells);
     cellRecord( c,:) = {fileName goodCells folderName imgName};
 
-    fprintf( '        Included Good cells with tracks: %s\n\n', join( string( goodCells), ' '))
+    % fprintf( '        Included Good cells with tracks: %s\n\n', join( string( goodCells), ' '))
 end
 
 tf = vertcat( tfComb{:}); % concatenates tf vertically to a big structure vairable
@@ -146,6 +147,7 @@ setCameraGain
     fprintf( ['\n     add extraNote to the fileName (usually about imaging setting)\n' ...
         '         1000ms or 20-200ms (20ms exposure, 200ms interval)\n\n'])
     extraNote = input( ' ~~~ extra notes: what is the imaging setting (i.e. 20-200ms):  ', 's');
+    % extraNote = '20-200ms';
     
     if ~isempty( extraNote)
         extraName = [ extraName ' ' extraNote];
