@@ -1,17 +1,18 @@
 %{
 Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 1/12/2026
-    Last update date: 1/19/2026
+    Last update date: 1/21/2026
 
     ~~~~~~~ adapted from plot_MSDxy_cell.m ~~~~~~~
 
 Description: This code calculates the MSD along cellular long & short axes
-    for loci data that have been spot-normalized.
+for loci data that have been spot-normalized.
 
 It makes one figure for each dataset
     1. MSD along cell short axis (x)
     2. MSD along cell long axis (L/y)
 
+I used bootstrap to estimate the uncertainty of the fitting parameters alpha
 ---------------------------------------------------------------------------
 %}
 
@@ -101,17 +102,26 @@ for i = plotNum
     scatter( time( plotRange), eataMSDx( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(1,:), ...
      'HandleVisibility', 'off', 'DisplayName', 'transverse x'), hold on
     
-        [Dapp, alphaFit] = plotFitLinear( time, eataMSDx, fitR, colorList(1,:));
+        [Dapp, alphaFit] = plotFitLinear( time, eataMSDx, fitR, colorList(1,:), 'x');
         fprintf( '        x: Dapp= %.2e, alpha= %.2f\n', Dapp,  alphaFit);
+        
+        % Bootstrap
+        EnsMSDx_good = EnsTAMSDx( cond, :); nboot = 1000;
+        fit_boot = bootstrapFit( EnsMSDx_good, nboot, time, fitR);
+        D_bootx = fit_boot(:,1);     alpha_bootx = fit_boot(:,2);
 
-    % 2. plot EATA-MSD for L/y Pos
+    % 2. plot EATA-MSD for L/y Pos        
     scatter( time( plotRange), eataMSDy( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(2,:), ...
      'HandleVisibility', 'off', 'DisplayName', 'longitudinal L')
 
-        [Dapp, alphaFit] = plotFitLinear( time, eataMSDy, fitR, colorList(2,:));
+        [Dapp, alphaFit] = plotFitLinear( time, eataMSDy, fitR, colorList(2,:), 'L');
         fprintf( '        L: Dapp= %.2e, alpha= %.2f\n\n', Dapp,  alphaFit);
 
-
+        % Bootstrap
+        EnsMSDy_good = EnsTAMSDy( cond, :);
+        fit_boot = bootstrapFit( EnsMSDy_good, nboot, time, fitR);
+        D_booty = fit_boot(:,1);     alpha_booty = fit_boot(:,2);
+    
     % figure setting
     figure( gcf), set( gca, 'LineWidth', 1, 'FontSize', 14)
     xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
@@ -120,6 +130,15 @@ for i = plotNum
     set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
     [limX, limY] = findLim( timeStep, strain);
     xlim( limX), ylim( limY)
+
+    
+    % 3. plot bootstrap results for alpha
+    figure, set( gcf, "Position", [410*c 190 200 270])
+    boxchart( ones( nboot, 1), alpha_bootx, 'MarkerStyle', '.'), hold on
+    boxchart( 2*ones( nboot, 1), alpha_booty, 'MarkerStyle', '.')
+    set( gca, 'XTick', [1 2], 'XTickLabel', {'x', 'L'}, 'FontSize', 14)
+    ylabel( '\alpha from Bootstrap'), grid on
+    title( sprintf( '%s %s', strain, strainName), 'FontSize', 14)
 end
 
 
@@ -163,7 +182,7 @@ function [ EnsMSD, EnsTAMSD] = getMSD( traj, maxT)
 end
 
 
-function [Dapp, alphaFit] = plotFitLinear( time, eataMSD, fitR, lineColor)
+function [Dapp, alphaFit] = plotFitLinear( time, eataMSD, fitR, lineColor, axisName)
 
         % linear fit
         f = polyfit( log( time( fitR)), log( eataMSD( fitR)), 1);
@@ -172,7 +191,7 @@ function [Dapp, alphaFit] = plotFitLinear( time, eataMSD, fitR, lineColor)
 
         % plot fitting line
         plot( t, MSDFit, 'LineWidth', 1, 'color', lineColor, ...
-            'DisplayName', sprintf( 'x: D\\alpha=%.1e, \\alpha=%.2f', Dapp, alphaFit))
+            'DisplayName', sprintf( '%s: D\\alpha=%.1e, \\alpha=%.2f', axisName, Dapp, alphaFit))
 end
 
 
@@ -190,4 +209,25 @@ function [limX, limY] = findLim( timeStep, strain)
     else
         limX = 'auto'; limY = 'auto';
     end
+end
+
+
+function fit_boot = bootstrapFit( EnsMSD, nboot, time, fitR)
+
+    fit_boot = nan( nboot, 2);
+    n = size( EnsMSD, 1);
+
+    tic
+    for b = 1: nboot
+        % Sample trajectories WITH replacement
+        idx = randi( n, n, 1);
+        MSD_boot = mean( EnsMSD(idx, fitR), 1, 'omitnan');
+
+        % linear fit
+        f = polyfit( log( time( fitR)), log( MSD_boot( fitR)), 1);
+        alphaFit = f(1);    DFit = exp( f(2))/4;
+
+        fit_boot(b,:) = [ DFit, alphaFit];  % store fitting result
+    end
+    % toc
 end

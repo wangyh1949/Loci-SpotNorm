@@ -100,9 +100,11 @@ for j = plotNum
 
         % x = abs( xxNorm( cond));    xlabelTxt = '|xNorm|';
         % x = abs( xPos( cond));      xlabelTxt = '|xPos| (µm)';
-        x = [ cellInfo( cellNum).length]'*1e6;  xlabelTxt = 'cell length (µm)';
+        x = abs( llNorm( cond)-0.5);    xlabelTxt = '|LNorm-0.5|';
+        % x = [ cellInfo( cellNum).length]'*1e6;  xlabelTxt = 'cell length (µm)';
 
-        % y = abs( xxNorm( cond));    ylabelTxt = '|xNorm|';
+        y = abs( xxNorm( cond));    ylabelTxt = '|xNorm|';
+        y = abs( llNorm( cond)-0.5);    ylabelTxt = '|LNorm-0.5|';
         y = tamsd1( cond);          ylabelTxt = 'MSD(1) (µm^2)';
     
     % plot scatter 
@@ -144,10 +146,11 @@ end
 
 function plotBinnedMeanStd( x, y)
 
-    % Cap high values to suppress outliers
+    % Cap extreme values to suppress outliers
     xCap = min(x, prctile(x, 99));
+    xCap = max(xCap, prctile(x, 1)); % also cap low values
 
-    xLim = [min(x) max(xCap)];  nBins = 12;
+    xLim = [min(xCap) max(xCap)];  nBins = 12;
     [~, edges, bin] = histcounts(x, nBins, 'BinLimits', xLim);
 
     % Compute bin centers
