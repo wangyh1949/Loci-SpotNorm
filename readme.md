@@ -16,13 +16,18 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
 - `meshCleanup_andor.m`: cleans up the cell meshes with abnormal cell size and shape.
 - `plot_spotNorm.m`: plots xNorm & lNorm from the data.
 - `plot_MSD_fit.m`: plots MSD & fitting of the tracking data.
+- `plot_all.m`: plot basic properties of the data: track length, MSD, bleaching, D & alpha & locErr histogram.
 
 ### Minor scripts
 
 - `plot_subMSD_cell.m`: plots MSD of subpopulations binned by cell geometry (length/width).
 - `plot_subMSD_spotNorm.m`: plots MSD of subpopulations binned by spotNorm (xNorm/LNorm).
+- `plot_subMSD_amp.m`: plots MSD of subpopulations binned by signal intensity (amplitude).
 - `plot_MSDxy_cell.m`: plots MSD along cellular long & short axes, two plots with multiple dataset overlaid
 - `plot_MSDxy_compare.m`: plots MSD along cellular long & short axes, one plot for each dataset
+- `plot_corr_tracks.m`: plots correlation of any two track quantities using scatter plot.
+- `plot_MSD_truncate_fit.m`: plot TA-MSD using truncated tracks.
+
 
 ## Before Running the Code
 
