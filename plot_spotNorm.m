@@ -49,6 +49,11 @@ for j = plotNum
     if isempty( index), strainName = strain;
     else, strainName = nameList{ index}; end
 
+        tInt = findInt( extraName, expDate, strain);
+        extraName = erase( extraName, [ ' ' tInt]);
+        expDate = erase( expDate, ' comb');
+
+
     % count spot number for each cell
     cellSpots = accumarray( cellNum(:), 1, [totalCells, 1]);
 
@@ -75,8 +80,8 @@ for j = plotNum
     lNorm = lNorm40( cond,:);
 
 
-    legtxt = sprintf( '%s (%s)', strain, expDate);
-    legtxt2 = sprintf( '%s%s', strainName);
+    legtxt = sprintf( '%s (%s)%s', strain, expDate, extraName);
+    legtxt2 = sprintf( '%s%s', strainName, extraName);
 
 
     % 1. plot abs( xNorm)

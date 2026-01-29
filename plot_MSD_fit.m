@@ -67,7 +67,7 @@ for j = plotNum
 
 
     % set up legend text
-    legtxt = sprintf( '%s', strainName);
+    legtxt = sprintf( '%s%s', strainName, extraName);
     legtxt2 = sprintf( '%s, %s', strain, expDate);
     
 

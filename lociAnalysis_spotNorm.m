@@ -68,7 +68,7 @@ dataPath = pwd; % current folder with raw uTrack & oufti output
     end
 
     % list all phase contrast images
-    phaseList = dir( fullfile( 'phase', 'epi*.tif'));
+    phaseList = dir( fullfile( 'phase', '*.tif'));
     imgPath = phaseList(1).folder;
 
     % load oufti mesh file
@@ -124,7 +124,7 @@ for m = combNum
     % fprintf( '        Included Good cells with tracks: %s\n\n', join( string( goodCells), ' '))
 end
 
-tf = vertcat( tfComb{:}); % concatenates tf vertically to a big structure vairable
+tf = vertcat( tfComb{ ~cellfun('isempty', tfComb)}); % concatenates tf vertically to a big structure vairable
 cellMeshAll = vertcat( cellMeshComb{:});
 
 fprintf( '~~~~~~~ tracksFinal Combination Finished ~~~~~~~\n\n');
