@@ -27,8 +27,8 @@ lociPath = fullfile( varPath, 'Loci SpotNorm'); % subfolder under varPath
 tfPath   = fullfile( lociPath, 'tracksFinal'); % subfolder under lociPath
 
 % find which files to plot
-tfFile = dir( fullfile( tfPath, ['tf oufti*']));
-plotNum = getPlotNum( tfFile);
+lociList = dir( fullfile( lociPath, 'Loci oufti*'));
+plotNum = getPlotNum( lociList);
 
 % set up figures
 f1 = figure( 'Position', [300 550 400 270]);
@@ -47,9 +47,12 @@ c = 0;
 for i = plotNum
 
     c = c + 1;
-    % load the trackFinal file
-    load( fullfile( tfPath, tfFile(i).name)),  fprintf( '    ~~~ %s loaded ~~~\n', tfName)
+    % load file info from loci file
+    load( fullfile( lociList( i).folder, lociList( i).name), 'tfPath', 'tfName')
     
+    % load the corresponding trackFinal file
+    load( fullfile( tfPath, tfName))
+
         % find strain name
         index = find( strcmp( string( strainList), strain(3:end)));    
         if isempty( index), strainName = strain;
@@ -59,6 +62,9 @@ for i = plotNum
 
     tl = cellfun( @length, {tracksFinal.amp}');
     cond = ( tl >= minTL);
+
+        fprintf( '   plotting %d+ frames,  %d/%d tracks     [%s]\n', ...
+            minTL, sum( cond), nTracks, tfName)
 
     maxT = max( tl); plotRange = 1: minTL;
 
