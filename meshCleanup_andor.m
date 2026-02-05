@@ -21,7 +21,6 @@ clear, clc, close all
 % load oufti mesh output (cell meshes)
 load( 'mesh.mat')
 
-
 % elimination criteria
 minArea = 100;  % minimal cell area (pixel)
 maxArea = 200;  % maximal cell area (pixel)
@@ -32,6 +31,10 @@ maxWid = 8.3;   % maximal cell width (pixel)
 % set up cell mesh and remove bad cells
 nImg = size( cellListN, 2);
 cellAll = cell( nImg, 1);
+badCellsTotal = 0;
+
+% calculate the cell number in each image
+totalCells = sum( cellfun( @length, cellList.cellId));
 
 for imgNum = 1: nImg % number of images
 
@@ -42,8 +45,7 @@ for imgNum = 1: nImg % number of images
     nCell = size( meshData, 1); % number of cells
 
     if nCell == 0  % in case no cell are detected
-        warning( '~~~~~~ Image %2d have no cell mesh ~~~~~~\n', imgNum)
-        continue
+        error( '~~~~~~ Image %2d have no cell mesh ~~~~~~\n', imgNum)
     end
     
     cellMesh( nCell, 1) = struct();
@@ -121,6 +123,7 @@ for imgNum = 1: nImg % number of images
     
     cellMesh( badCells) = [];
     cellAll{ imgNum} = cellMesh;
+    badCellsTotal = badCellsTotal + sum( badCells);
 end
 
 % recalculate the cell number in each image
@@ -129,7 +132,7 @@ cellListN = cellfun( @length, cellList.cellId);
 % save as mesha.mat file
 save( 'mesha', 'p', 'rawPhaseFolder', 'cellList', 'cellListN', 'paramString', 'cellAll')
 
-fprintf( '\n~~~~~~ all images cleanup done ~~~~~~\n\n')
+fprintf( '\n~~~~~~ all images cleanup done,  %d/%d cells are cleaned ~~~~~~\n\n', badCellsTotal, totalCells)
 
 cellAll = vertcat( cellAll{:});
 
