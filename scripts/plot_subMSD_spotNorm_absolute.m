@@ -65,8 +65,6 @@ for j = plotNum
     % binData = abs( mean( tracksLNorm40, 2)-0.5);  binName = 'LNorm';
     % binData = abs( tracksxNorm(:,1));  binName = '|xNorm|'; % xNorm of first spot
 
-    % binPer = [0 0.2 0.4 0.6 0.8 1]; % binning percentage
-    % binList = quantile( binData, binPer);
     binList = [0 0.1 0.2 0.3 0.4 1]; % binning absolute value
     % binList = [0 0.4 0.5 1]; % binning absolute value
     
@@ -84,8 +82,6 @@ for j = plotNum
         condspotNorm = binData >= binList(k) & binData < binList(k+1); % spotNorm in this bin    
         condTracks = cond & condspotNorm; % overall flag for good tracks
 
-        % legtxt = sprintf( '%s (%s)', strain, expDate);
-        % legtxt = sprintf( '%s: %g%%-%g%%', binName, binPer(k)*100, binPer(k+1)*100);
         legtxt = sprintf( '%s: %.1f-%.1f', binName, binList(k), binList(k+1));
         % legtxt = sprintf( '%s: %.1f-%.1f, %d tracks', binName, binList(k), binList(k+1), sum( condTracks));
 

@@ -75,7 +75,7 @@ for j = plotNum
     DFitList = nan( numel( plotNum), 1);   
 
     % create figures
-    f1 = figure; set( f1, 'Position', [300+20*cc 500+20*cc 400 300])
+    % f1 = figure; set( f1, 'Position', [300+20*cc 500+20*cc 400 300])
     f2 = figure; set( f2, 'Position', [810+20*cc 500+20*cc 400 300])
 
     for k = 1: numel( binList)- 1
@@ -89,7 +89,7 @@ for j = plotNum
         % legtxt = sprintf( '%s (%s)', strain, expDate);
         legtxt = sprintf( '%s: %g%%-%g%%', binName, binPer(k)*100, binPer(k+1)*100);
 
-        fprintf( '      %d/%d tracks,   %s\n', sum( condTracks), sum( cond), legtxt)
+        fprintf( '      %d/%d tracks,   %s', sum( condTracks), sum( cond), legtxt)
         
             eaMSD = mean( EnsMSD( condTracks,:), 1, 'omitnan'); % unit: um^2
             eataMSD = mean( EnsTAMSD( condTracks, :), 1, 'omitnan');    
@@ -98,10 +98,10 @@ for j = plotNum
         % plotRange = 1: maxTau;
         plotRange = 1: minTL;
         
-        % 1. plot EA-MSD
-        figure( f1)
-        scatter( time( plotRange), eaMSD( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(c,:), ...
-            'DisplayName', legtxt), hold on
+        % % 1. plot EA-MSD
+        % figure( f1)
+        % scatter( time( plotRange), eaMSD( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(c,:), ...
+        %     'DisplayName', legtxt), hold on
 
         % 2. plot EATA-MSD
         figure( f2)
@@ -120,13 +120,13 @@ for j = plotNum
     [limX, limY] = findLim( timeStep, strain);
         % limY = 'auto';
     
-    % 1. EA-MSD
-    figure( f1), set( gca, 'LineWidth', 1, 'FontSize', 14)
-    xlabel( 'Time (s)'), ylabel( 'EA-MSD (µm^2)')
-    legend( 'Location', 'best', 'box', 'off', 'FontSize', 8)
-    title( sprintf( '%s %s (%s, %d+f)', strain, strainName, expDate, minTL), 'FontSize', 14)
-    set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
-    xlim( limX), ylim( limY)
+    % % 1. EA-MSD
+    % figure( f1), set( gca, 'LineWidth', 1, 'FontSize', 14)
+    % xlabel( 'Time (s)'), ylabel( 'EA-MSD (µm^2)')
+    % legend( 'Location', 'best', 'box', 'off', 'FontSize', 8)
+    % title( sprintf( '%s %s (%s, %d+f)', strain, strainName, expDate, minTL), 'FontSize', 14)
+    % set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
+    % xlim( limX), ylim( limY)
     
     
     % 2. EATA-MSD

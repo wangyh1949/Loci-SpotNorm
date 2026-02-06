@@ -38,8 +38,8 @@ minTL = 90; % minimal trackLength for MSD calculation
 
 % fitting range
 fitR = 1:40;    fitR_nl = fitR;
-fitTxt1 = sprintf( '%d:%d fit', min( fitR), max( fitR));
-fitTxt_nl = sprintf( '%d:%d fit', min( fitR_nl), max( fitR_nl));
+fitTxt1 = sprintf( '%d:%d', min( fitR), max( fitR));
+fitTxt_nl = sprintf( '%d:%d', min( fitR_nl), max( fitR_nl));
 
 % set up figures
 f1 = figure( 'Position', [300 400 400 380]);
@@ -91,54 +91,55 @@ for j = plotNum
     
     % 1. plot EA-MSD & linear fit
     figure( f1)
-    scatter( time( plotRange), eaMSD( plotRange), 40, 'filled', 'MarkerFaceColor', colorList(c,:),...
-        'MarkerFaceAlpha', 0.5, 'HandleVisibility','off'), hold on
+    scatter( time( plotRange), eaMSD( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(c,:),...
+        'MarkerFaceAlpha', 0.7, 'HandleVisibility','off'), hold on
         
         % linear fit
         f = polyfit( log( time( fitR)), log( eaMSD( fitR)), 1);
         alphaFit2 = f(1);    Dapp2 = exp( f(2))/4;
         t = time( fitR);  MSDFit =  4 * Dapp2* t.^ alphaFit2;
-        plot( t, MSDFit, 'LineWidth', 1.5, 'color', colorList(c,:), ...
+        plot( t, MSDFit, 'LineWidth', 1, 'color', colorList(c,:), ...
             'DisplayName', sprintf( 'D\\alpha=%.1e, \\alpha=%.2f [%s]', Dapp2, alphaFit2, legtxt2))
 
 
     % 2. plot EA-MSD & non-linear fit
     figure( f2)
-    scatter( time( plotRange), eaMSD( plotRange), 40, 'filled', 'MarkerFaceColor', colorList(c,:),...
-        'MarkerFaceAlpha', 0.5, 'HandleVisibility','off'), hold on
+    scatter( time( plotRange), eaMSD( plotRange), 20, 'filled', 'MarkerFaceColor', colorList(c,:),...
+        'MarkerFaceAlpha', 0.7, 'HandleVisibility','off'), hold on
 
         % non-linear fit
         [DFit, alphaFit, locErrFit, f] = nonLinearMSDFit( time, eaMSD, fitR_nl, expT);
         t =  linspace( time(1), time( max( minTL, fitR_nl(end))), 100);
         MSDFit =  4* DFit* t.^ alphaFit + 4*f.c;
-        plot( t, MSDFit, 'LineWidth', 1.5, 'color', [ colorList(c,:) ], 'DisplayName', ...
+        plot( t, MSDFit, 'LineWidth', 1, 'color', [ colorList(c,:) ], 'DisplayName', ...
             sprintf( 'D=%.1e, \\alpha=%.2f, \\sigma=%.0f [%s]', DFit, alphaFit, locErrFit*1e3, legtxt))
         fprintf( '     EA fit:  f.c = %f,   locE = %g\n', f.c, locErrFit*1e3)
     
 
     % 3. plot EATA-MSD & linear fit
     figure( f3)
-    scatter( time( plotRange), eataMSD( plotRange), 20, 'LineWidth', 1.75, 'MarkerEdgeColor', colorList(c,:),...
-        'MarkerEdgeAlpha', 0.5, 'HandleVisibility','off'), hold on
+    scatter( time( plotRange), eataMSD( plotRange), 20, 'filled', ...
+        'MarkerFaceColor', colorList(c,:), 'HandleVisibility', 'off'), hold on
         
         % linear fit
         f = polyfit( log( time( fitR)), log( eataMSD( fitR)), 1);
         alphaFit = f(1);    Dapp = exp( f(2))/4; 
         t = time( fitR);   MSDFit =  4* Dapp* t.^ alphaFit;
-        plot( t, MSDFit, 'LineWidth', 1.5, 'color', [ colorList(c,:) ], ...
+        plot( t, MSDFit, 'LineWidth', 1, 'color', [ colorList(c,:) ], ...
             'DisplayName', sprintf( '\\alpha=%.2f [%s]', alphaFit, legtxt))
 
 
     % 4. plot EATA-MSD & non-linear fit
     figure( f4)
-    scatter( time( plotRange), eataMSD( plotRange), 20, 'LineWidth', 1.75, 'MarkerEdgeColor', colorList(c,:),...
-        'MarkerEdgeAlpha', 0.5, 'HandleVisibility','off'), hold on
+    scatter( time( plotRange), eataMSD( plotRange), 20, 'filled', ...
+        'MarkerFaceColor', colorList(c,:), 'HandleVisibility', 'off'), hold on
 
         % non-linear fit
         [DFit, alphaFit, locErrFit, f] = nonLinearMSDFit( time, eataMSD, fitR_nl, expT);
-        t =  linspace( time(1), time( max( minTL, fitR_nl(end))), 100);
+        t =  linspace( time(1), time( max( minTL, fitR_nl(end))), 100); % extend to 100f
+        t =  linspace( time(1), time( fitR_nl(end))); % fit region
         MSDFit =  4* DFit* t.^ alphaFit + 4*f.c;
-        plot( t, MSDFit, 'LineWidth', 1.5, 'color', [ colorList(c,:) ], 'DisplayName', ...
+        plot( t, MSDFit, 'LineWidth', 1, 'color', [ colorList(c,:) ], 'DisplayName', ...
             sprintf( '\\alpha=%.2f, \\sigma=%.0f [%s]', alphaFit, locErrFit*1e3, legtxt))
         fprintf( '   EATA fit:  f.c = %f,   locE = %g\n\n', f.c, locErrFit*1e3)
 
@@ -156,7 +157,7 @@ end
 figure( f1), set( gca, 'LineWidth', 1, 'FontSize', 13)
 xlabel( 'Time (s)'), ylabel( 'EA-MSD (µm^2)')
 legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 10)
-title( sprintf( 'EA-MSD (%d+frame, %s)', minTL, fitTxt1), 'FontSize', 14)
+title( sprintf( 'EA-MSD (%d+frame, %s fit)', minTL, fitTxt1), 'FontSize', 14)
 set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
 xlim( limX), ylim( limY)
 
@@ -164,8 +165,8 @@ xlim( limX), ylim( limY)
 figure( f3), set( gca, 'LineWidth', 1, 'FontSize', 13)
 % set( gca, 'Xtick', [1 10 100])
 xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)') % ylabel( 'EATA-MSD (µm^2)')
-legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 11)
-title( sprintf( 'EATA-MSD (%d+frame, %s)', minTL, fitTxt1), 'FontSize', 14)
+legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 10)
+title( sprintf( '%d+f, %s linear fit', minTL, fitTxt1), 'FontSize', 14)
 set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
 xlim( limX), ylim( limY)
 
@@ -181,7 +182,7 @@ xlim( limX), ylim( limY)
 figure( f4), set( gca, 'LineWidth', 1, 'FontSize', 13)
 xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
 legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 10)
-title( sprintf( 'EATA-MSD (%d+frame, %s)', minTL, fitTxt_nl), 'FontSize', 14)
+title( sprintf( '%d+frame, %s non-linear fit', minTL, fitTxt_nl), 'FontSize', 14)
 set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
 xlim( limX), ylim( limY)
 

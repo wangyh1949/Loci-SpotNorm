@@ -8,7 +8,7 @@ Author: Yu-Huan Wang   (Kim Lab at UIUC) - yuhuanw2@illinois.edu
 Description: This code numerically simulate the xNorm of loci
 
 I assumed loci position is homogeneously distributed in a cylinder
-(effectively like cytoplasmic proteins), 
+(effectively like cytoplasmic proteins)
 ---------------------------------------------------------------------------
 %}
 

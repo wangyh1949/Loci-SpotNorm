@@ -56,7 +56,7 @@ for j = plotNum
     cond = ( tl>= minTL) & frame(:,1) == 1;
     % cond = ( tl>= minTL);
     
-    fprintf( '   plotting tracks with %d+ frames,  %d/%d tracks    %s\n\n', ...
+    fprintf( '\n  plotting tracks with %d+ frames,  %d/%d tracks    %s\n\n', ...
         minTL, sum( cond), nTracks, lociName)
     
         maxTau = size( EnsMSD, 2);
@@ -90,7 +90,7 @@ for j = plotNum
         % legtxt = sprintf( '%s (%s)', strain, expDate);
         legtxt = sprintf( '%s: %g%%-%g%%', binName, binPer(k)*100, binPer(k+1)*100);
 
-        fprintf( '      %d/%d tracks,   %s\n', sum( condTracks), sum( cond), legtxt)
+        fprintf( '     %d/%d tracks,   %s\n', sum( condTracks), sum( cond), legtxt)
         
             eaMSD = mean( EnsMSD( condTracks,:), 1, 'omitnan'); % unit: um^2
             eataMSD = mean( EnsTAMSD( condTracks, :), 1, 'omitnan');    
@@ -114,7 +114,7 @@ for j = plotNum
             alphaFit = f(1);    DFit = exp( f(2))/4;    
             alphaFitList(c) = alphaFit;    DFitList(c) = DFit;
             t = time( fitR);   MSDFit =  4* DFit* t.^ alphaFit;
-            fprintf( '       EATA fit: D = %.1e,  alpha = %.2f\n', DFit, alphaFit) % print fit result
+            fprintf( '         EATA fit: D = %.1e,  alpha = %.2f\n', DFit, alphaFit) % print fit result
     end
 
 

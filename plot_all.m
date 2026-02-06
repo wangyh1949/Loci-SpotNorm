@@ -25,6 +25,7 @@ clear, clc, close all
 % set the path for storing analysis results
 varPath = 'C:\Users\yuhuanw2\Documents\MATLAB\Lab Data\Track and Cell Variables\';
 lociPath = fullfile( varPath, 'Loci SpotNorm'); % subfolder under varPath
+% lociPath = fullfile( varPath, 'Loci SpotNorm', 'single day'); % subfolder under varPath
 
 % find which files to plot
 lociList = dir( fullfile( lociPath, 'Loci oufti*'));
@@ -144,7 +145,7 @@ for j = plotNum
 
         tFrame = 1: minTL; % frame N
         plot( tFrame, amp(tFrame), '-', 'LineWidth', 2, 'color', colorList(c,:), ...
-            'DisplayName', legtxt2), hold on
+            'DisplayName', legtxt3), hold on
     
 
         
@@ -203,7 +204,7 @@ title( 'Track Length Distribution', 'FontSize', 14)
 figure( f2), set( gca, 'LineWidth', 1, 'FontSize', 14)
 xlabel( 'Time (s)'), ylabel( 'MSD (µm^2)')
 title( sprintf( '%s (%d+ frames, %s)', msdName, minTL, fitTxt1), 'FontSize', 14)
-legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 12)
+legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 11)
 set( gca, 'Xscale', 'log', 'YScale', 'log')
 
 [limX, limY] = findLim( timeStep, strain);

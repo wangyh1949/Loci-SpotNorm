@@ -17,6 +17,7 @@ clear, clc, close all
 % set the path to store analysis results
 varPath = 'C:\Users\yuhuanw2\Documents\MATLAB\Lab Data\Track and Cell Variables\';
 lociPath = fullfile( varPath, 'Loci SpotNorm'); % subfolder under varPath
+% lociPath = fullfile( varPath, 'Loci SpotNorm', 'single day'); % subfolder under varPath
 
 % find which files to plot
 lociList = dir( fullfile( lociPath, 'Loci oufti*'));
@@ -82,6 +83,7 @@ for j = plotNum
 
     legtxt = sprintf( '%s (%s)%s', strain, expDate, extraName);
     legtxt2 = sprintf( '%s%s', strainName, extraName);
+    legtxt = sprintf( '%s, %s', strain, strainName);
 
 
     % 1. plot abs( xNorm)
@@ -116,7 +118,7 @@ set( gca, 'FontSize', 14, 'Xtick', 0:0.2:1, 'LineWidth', 1)
 xlabel([ '|xNorm|, bin=' num2str( xNormBin)]), ylabel( 'Probability')
 title( sprintf( 'Cell with %s', extra))
 legend( 'Location', 'northeast', 'box', 'off', 'FontSize', 11)
-ylim( [0 0.13])
+ylim( [0 0.15])
 
 % lNorm
 figure(2)
