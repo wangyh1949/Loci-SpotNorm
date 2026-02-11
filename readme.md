@@ -5,7 +5,7 @@ This repo analyze the loci tracking data by combining the output from oufti & u-
 All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (pixel=160nm)
 
 - imaging setting: YFP_yh, 5mW 514nm, 20-200ms, 101 frames, Gain 3, 300x, angle=8400
-- Current dataset: SK734, 727, 729, 731 (2025 Fall, taken by Liam)
+- Current dataset: SK727-731, 734
 
 ### Major scripts
 
@@ -26,7 +26,7 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
 - `plot_MSDxy_cell.m`: plots MSD along cellular long & short axes, two plots with multiple dataset overlaid
 - `plot_MSDxy_compare.m`: plots MSD along cellular long & short axes, one plot for each dataset
 - `plot_corr_tracks.m`: plots correlation of any two track quantities using scatter plot.
-- `plot_MSD_truncate_fit.m`: plot TA-MSD using truncated tracks.
+- `plot_MSD_truncate_fit.m`: plot TA-MSD using truncated tracks to compare with conventioanal TA.
 
 
 ## Before Running the Code

@@ -72,8 +72,8 @@ for j = plotNum
     
     colorList = flip( winter( numel( binList))); c = 0;
     
-    alphaFitList = nan( numel( plotNum), 1);
-    DFitList = nan( numel( plotNum), 1);
+    alphaFitList = nan( numel( binList)- 1, 1);
+    DFitList = nan( numel( binList)- 1, 1);
 
     % create figures
     % f1 = figure; set( f1, 'Position', [410*cc-300 350 400 270])

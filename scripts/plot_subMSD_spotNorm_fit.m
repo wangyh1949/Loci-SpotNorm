@@ -72,7 +72,7 @@ for j = plotNum
     binList = quantile( binData, binPer); 
     
     colorList = flip( winter( numel( binPer))); c = 0; 
-    DFitList = nan( numel( plotNum), 1);   
+    DFitList = nan( numel( binList)- 1, 1);
 
     % create figures
     % f1 = figure; set( f1, 'Position', [300+20*cc 500+20*cc 400 300])

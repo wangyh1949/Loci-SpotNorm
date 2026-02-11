@@ -26,9 +26,8 @@ lociPath = fullfile( varPath, 'Loci SpotNorm'); % subfolder under varPath
 tfPath   = fullfile( lociPath, 'tracksFinal'); % subfolder under lociPath
 
 % find which files to plot
-tfFile = dir( fullfile( tfPath, 'tf oufti*'));
-plotNum = getPlotNum( tfFile);
-
+lociList = dir( fullfile( lociPath, 'Loci oufti*'));
+plotNum = getPlotNum( lociList);
 
 % set up strain name info
 strainList = { 727 728 729 730 731 734 701 662 311 725};
@@ -42,13 +41,13 @@ c = 0;
 
 for i = plotNum
 
-    c = c + 1;
-    % load the trackFinal file
-    load( fullfile( tfPath, tfFile(i).name))
 
-    % load the corresponding loci file
-    lociName = [ 'Loci oufti ' strain ' ' expDate extraName];
-    load( fullfile( lociPath, lociName))
+    c = c + 1;
+    % load loci file
+    load( fullfile( lociList( i).folder, lociList( i).name))
+    
+    % load the corresponding trackFinal file
+    load( fullfile( tfPath, tfName))
     
         % find strain name
         index = find( strcmp( string( strainList), strain(3:end)));    

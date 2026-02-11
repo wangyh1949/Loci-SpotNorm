@@ -2,7 +2,7 @@
 ---------------------------------------------------------------------------
 Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 1/21/2026
-    Last update date: 1/21/2026
+    Last update date: 2/11/2026
 
 Description: This script plot the correlation of any two track quantities
 (such as amplitude, spotNorm, cellLength), each track as one data point
@@ -44,12 +44,8 @@ for j = plotNum
     if isempty( index), strainName = strain;
     else, strainName = nameList{ index}; end
     
-    legtxt = sprintf( '%s (%s)', strain, expDate);
-    legtxt2 = sprintf( '%s %s', strain, strainName);
-
-
     % set up figures
-    figure, set( gcf, "Position", [410*c-110 550 400 350])
+    figure, set( gcf, "Position", [355*c-330 550 350 300])
 
     % count spot number for each cell
     cellSpots = accumarray( cellNum(:), 1, [totalCells, 1]);
@@ -66,6 +62,7 @@ for j = plotNum
 
     % extract amplitude variables
     amp = tracksAmp(:,1); % take amplitude at first frame
+    % amp = mean( tracksAmp(:,1:40), 2); % average amplitude of first 40 frames
 
     % ~~~~~~~~ Condition ~~~~~~~~~
 
@@ -96,17 +93,37 @@ for j = plotNum
     xPos = xxNorm.* [cellInfo( cellNum).width]'*1e6; % absolute x position, unit: um
 
 
+        % legtxt = sprintf( '%s (%s)', strain, expDate);
+        legtxt = sprintf( '%d tracks', sum( cond));
+        legtxt2 = sprintf( '%s %s', strain, strainName);
+
     % select x and y for plotting
-
+           
+       
+        % % 1. MSD(1) vs. spotNorm
+        % y = tamsd1( cond);          ylabelTxt = 'MSD(1) (µm^2)';
         % x = abs( xxNorm( cond));    xlabelTxt = '|xNorm|';
-        % x = abs( xPos( cond));      xlabelTxt = '|xPos| (µm)';
-        x = abs( llNorm( cond)-0.5);    xlabelTxt = '|LNorm-0.5|';
-        % x = [ cellInfo( cellNum).length]'*1e6;  xlabelTxt = 'cell length (µm)';
+        % % x = abs( llNorm( cond)-0.5);    xlabelTxt = '|LNorm-0.5|';
 
-        y = abs( xxNorm( cond));    ylabelTxt = '|xNorm|';
-        y = abs( llNorm( cond)-0.5);    ylabelTxt = '|LNorm-0.5|';
-        y = tamsd1( cond);          ylabelTxt = 'MSD(1) (µm^2)';
-    
+        % % 2. MSD(1) vs. amp
+        % y = tamsd1( cond); ylabelTxt = 'MSD(1) (µm^2)';
+        % x = amp( cond);    xlabelTxt = 'amplitude (a.u.)';
+
+        % % 3. spotNorm vs cellLength
+        % x = [ cellInfo( cellNum).length]'*1e6;  xlabelTxt = 'cell length (µm)';
+        % y = abs( xxNorm( cond));    ylabelTxt = '|xNorm|';
+        % y = abs( llNorm( cond)-0.5);    ylabelTxt = '|LNorm-0.5|';
+
+        % % 4. amp vs. spotNorm (no correlation)
+        % y = amp( cond);    ylabelTxt = 'amplitude (a.u.)';
+        % x = abs( xxNorm( cond));    xlabelTxt = '|xNorm|';
+        % % x = abs( llNorm( cond)-0.5);    xlabelTxt = '|LNorm-0.5|';
+
+        % 5. amp vs. trackLength
+        y = amp( cond);    ylabelTxt = 'amplitude (a.u.)';
+        x = tl( cond);    xlabelTxt = 'trackLength';
+
+
     % plot scatter 
     scatter( x, y, 20, 'filled', 'MarkerFaceAlpha', 0.1, 'DisplayName', legtxt), hold on
 
@@ -119,6 +136,7 @@ for j = plotNum
     xlabel( xlabelTxt), ylabel( ylabelTxt)
     legend( 'Location', 'northeast', 'box', 'off', 'FontSize', 12)
     title( legtxt2)
+    % xlim( [2 5]), ylim( [0 0.5])
 end
 
 

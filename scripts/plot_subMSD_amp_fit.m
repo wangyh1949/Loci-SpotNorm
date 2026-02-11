@@ -71,12 +71,12 @@ for j = plotNum
     
     colorList = flip( winter( numel( binPer))); c = 0;
 
-    alphaFitList = nan( numel( plotNum), 1);
-    DFitList = nan( numel( plotNum), 1);
+    alphaFitList = nan( numel( binList)- 1, 1);
+    DFitList = nan( numel( binList)- 1, 1);
 
     % create figures
-    % f1 = figure; set( f1, 'Position', [300+20*cc 500+20*cc 400 300])
-    f2 = figure; set( f2, 'Position', [810+20*cc 500+20*cc 400 300])
+    % f1 = figure; set( f1, 'Position', [300+20*cc 500+20*cc 400 270])
+    f2 = figure; set( f2, 'Position', [810+20*cc 500+20*cc 400 270])
 
     for k = 1: numel( binList)- 1
     
@@ -136,6 +136,7 @@ for j = plotNum
     xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
     legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 8)
     title( sprintf( '%s %s (%s, %df+)', strain, strainName, expDate, minTL), 'FontSize', 14)
+    title( sprintf( '%s %s (%s)', strain, strainName, expDate), 'FontSize', 14)
     set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
     xlim( limX), ylim( limY)
 
