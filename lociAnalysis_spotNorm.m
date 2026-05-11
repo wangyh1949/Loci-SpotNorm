@@ -158,7 +158,7 @@ setCameraGain
 % save tracksFinal files
 tfName = ['tf oufti ' strain ' ' expDate extraName];
 
-save( fullfile( tfPath, tfName), 'varPath', 'lociPath', 'dataPath', 'imgPath', 'tracksFinal', ...
+save( [ fullfile( tfPath, tfName) '.mat'], 'varPath', 'lociPath', 'dataPath', 'imgPath', 'tracksFinal', ...
     'cellMeshAll', 'cellRecord', 'cameraFlag', 'pixelSize', 'sigToPhoton', ...
     'folderName', 'expDate', 'strain', 'extraName', 'tfPath', 'tfName')
 
@@ -194,10 +194,7 @@ for i = 1: nTracks
     nFrames = length( tracksFinal(i).amp); % number of frames in this track
     tracksAmp( i, 1:nFrames) = tracksFinal(i).amp'; % converted to photon
     posStd(i) = tracksFinal(i).std(1)* pixelSize; % std of position, unit: m
-    
-    % Stage Drift Correction
-    frame = tracksFinal(i).frame(1): tracksFinal(i).frame(2);
-    
+        
     traj = tracksFinal(i).traj* pixelSize; % unit: m
     
     % % ~~~~ Jump Displacement ~~~~    unit: um
@@ -272,7 +269,7 @@ tracksMid40 = tracksLNorm40 > bound & tracksLNorm40 < 1-bound;
 % save variables for plotting, tracksFinal not saved (save space)
 lociName = [ 'Loci oufti ' strain ' ' expDate extraName];
 
-save( fullfile( lociPath, lociName), 'varPath', 'lociPath', 'dataPath', 'imgPath', ...
+save( [ fullfile( lociPath, lociName) '.mat'], 'varPath', 'lociPath', 'dataPath', 'imgPath', ...
     'cellRecord', 'cameraFlag', 'pixelSize', 'sigToPhoton', ...
     'maxT', 'timeStep', 'cellNum', 'totalCells', ...
     'nTracks', 'EnsMSD', 'EnsTAMSD', 'fitTxt', 'alpha', 'Dalpha', 'posStd', ...

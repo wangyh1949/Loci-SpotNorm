@@ -81,7 +81,8 @@ for j = plotNum
 
     % set up legend text
     legtxt = sprintf( '%s%s', strainName, extraName);
-    legtxt2 = sprintf( '%s, %s', strain, expDate);
+    % legtxt = sprintf( '%s%s', strain, extraName);
+    % legtxt = sprintf( '%s, %s', strain, expDate);
     legtxt3 = sprintf( '%s %s%s', strain, strainName, extraName);
 
     % ~~~~~~~~ Condition ~~~~~~~~~
@@ -100,7 +101,7 @@ for j = plotNum
 
         [f,x] = ecdf( tl_good); x = x(2:end); f = f(1:end-1);
         plot( x, 1-f, 'LineWidth', 2, 'Color', colorList(c,:), 'DisplayName',...
-            sprintf( '%d tracks [%s]', length(tl_good), legtxt3)), hold on
+            sprintf( '%d tracks [%s]', length(tl_good), legtxt)), hold on
     
     
     % 2. EA-MSD & fitting
@@ -109,20 +110,20 @@ for j = plotNum
     % calculate EA-MSD & EATA-MSD
     eaMSD = mean( EnsMSD( cond,:), 1, 'omitnan'); % unit: um^2
     eataMSD = mean( EnsTAMSD( cond, :), 1, 'omitnan');
-    % msd = eaMSD;    msdName = 'EA-MSD';
-    msd = eataMSD;    msdName = 'EATA-MSD';
+    msd = eaMSD;    msdName = 'EA-MSD';
+    % msd = eataMSD;    msdName = 'EATA-MSD';
     
         % determine time step
         maxTau = size( EnsMSD, 2);
         time = (1: maxTau)* timeStep;
             
         if ~logical( fitFlag) % no fitting
-            scatter( time, msd, 40, 'filled', 'MarkerFaceColor', colorList(c,:),...
+            scatter( time, msd, 20, 'filled', 'MarkerFaceColor', colorList(c,:),...
                 'MarkerFaceAlpha', 0.5, 'DisplayName',...
                 sprintf( '%s, %d tracks', legtxt, sum( cond))), hold on
             fitTxt1 = 'no fit';
         else % with fitting
-            scatter( time, msd, 40, 'filled', 'MarkerFaceColor', colorList(c,:),...
+            scatter( time, msd, 20, 'filled', 'MarkerFaceColor', colorList(c,:),...
                 'MarkerFaceAlpha', 0.5, 'HandleVisibility','off'), hold on
     
             % linear fitting,  MSD = 4*D*t^alpha        
@@ -145,7 +146,7 @@ for j = plotNum
 
         tFrame = 1: minTL; % frame N
         plot( tFrame, amp(tFrame), '-', 'LineWidth', 2, 'color', colorList(c,:), ...
-            'DisplayName', legtxt3), hold on
+            'DisplayName', legtxt), hold on
     
 
         
@@ -174,7 +175,7 @@ for j = plotNum
     aAlpha = alpha( cond);  meanAlpha = mean( aAlpha);
     histogram( aAlpha, 'BinWidth', 0.04, 'LineWidth', 2, 'EdgeColor', colorList(c,:),...
         'Normalization', 'probability', 'DisplayStyle', 'stairs', 'DisplayName', ...
-        sprintf( '\\langle\\alpha\\rangle=%.2f\\pm%.2f  [%s]', meanAlpha, std(aAlpha), legtxt3)), hold on
+        sprintf( '\\langle\\alpha\\rangle=%.2f\\pm%.2f  [%s]', meanAlpha, std(aAlpha), legtxt)), hold on
     % xline( alphaFit, '--', 'color', colorList(c,:), 'LineWidth', 1.5, 'HandleVisibility', 'off')
     
     
@@ -198,13 +199,14 @@ xlabel( 'Track Length (frames)'), ylabel( '1-CDF (portion)')
 legend( 'Location', 'best', 'box', 'off', 'FontSize', 11)
 title( 'Track Length Distribution', 'FontSize', 14)
 % xline(12, '--', 'LineWidth', 1.5, 'FontSize', 13, 'HandleVisibility', 'off')
+ylim( [0 1])
 
 
 % MSD & fitting
 figure( f2), set( gca, 'LineWidth', 1, 'FontSize', 14)
 xlabel( 'Time (s)'), ylabel( 'MSD (µm^2)')
 title( sprintf( '%s (%d+ frames, %s)', msdName, minTL, fitTxt1), 'FontSize', 14)
-legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 11)
+legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 10)
 set( gca, 'Xscale', 'log', 'YScale', 'log')
 
 [limX, limY] = findLim( timeStep, strain);

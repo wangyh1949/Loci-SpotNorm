@@ -24,6 +24,11 @@ lociPath = fullfile( varPath, 'Loci SpotNorm'); % subfolder under varPath
 
 % find which files to plot
 lociList = dir( fullfile( lociPath, 'Loci oufti*'));
+
+% lociPath = fullfile( varPath, 'Loci', '20ms'); % subfolder under varPath
+% % find which files to plot
+% lociList = dir( fullfile( lociPath, 'Loci*'));
+
 plotNum = getPlotNum( lociList);
 
     strainList = { 727 728 729 730 731 734 701 662 311 725};
@@ -37,7 +42,7 @@ plotNum = getPlotNum( lociList);
 minTL = 90; % minimal trackLength for MSD calculation
 
 % fitting range
-fitR = 1:40;    fitR_nl = fitR;
+fitR = 1:90;    fitR_nl = fitR;
 fitTxt1 = sprintf( '%d:%d', min( fitR), max( fitR));
 fitTxt_nl = sprintf( '%d:%d', min( fitR_nl), max( fitR_nl));
 
@@ -66,7 +71,7 @@ for j = plotNum
         expT = str2double( regexp( tInt, '\d+', 'match', 'once'))/1e3; % exposure time: s
 
 
-    % set up legend text
+    % set up legend texts
     legtxt = sprintf( '%s%s', strainName, extraName);
     legtxt2 = sprintf( '%s, %s', strain, expDate);
     
@@ -166,7 +171,7 @@ figure( f3), set( gca, 'LineWidth', 1, 'FontSize', 13)
 % set( gca, 'Xtick', [1 10 100])
 xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)') % ylabel( 'EATA-MSD (µm^2)')
 legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 10)
-title( sprintf( '%d+f, %s linear fit', minTL, fitTxt1), 'FontSize', 14)
+title( sprintf( '%s linear fit (%d+frame)', fitTxt_nl, minTL), 'FontSize', 14)
 set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
 xlim( limX), ylim( limY)
 
@@ -182,7 +187,7 @@ xlim( limX), ylim( limY)
 figure( f4), set( gca, 'LineWidth', 1, 'FontSize', 13)
 xlabel( 'Time (s)'), ylabel( 'EATA-MSD (µm^2)')
 legend( 'Location', 'northwest', 'box', 'off', 'FontSize', 10)
-title( sprintf( '%d+frame, %s non-linear fit', minTL, fitTxt_nl), 'FontSize', 14)
+title( sprintf( '%s non-linear fit (%d+frame)', fitTxt_nl, minTL), 'FontSize', 14)
 set( gca, 'Xscale', 'log', 'YScale', 'log'), box on
 xlim( limX), ylim( limY)
 
@@ -224,8 +229,8 @@ function [limX, limY] = findLim( timeStep, strain)
         if strcmp( strain, 'SK311')
             limX = [0.1 30]; limY = [1e-3 0.1]; % 20-200ms, with SK311
         end
-    elseif timeStep == 0.02
-        limX = [0.01 3]; limY = [3e-4 0.03]; % 20-200ms, with SK311
+    elseif timeStep - 0.02 < 2e-3
+        limX = [0.01 3]; limY = [1e-3 0.05]; % 20-200ms, with SK311
     else
         limX = 'auto'; limY = 'auto';
     end

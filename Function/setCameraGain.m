@@ -15,13 +15,13 @@ Default imaging setting for loci tracking experiments
 %}
 
 
-% cameraFlag = input( '\n ~~~ What is the camera (1:andor, 2:hama):  ');
-cameraFlag = 1; 
+cameraFlag = input( '\n ~~~ What is the camera (1:andor, 2:hama):  ');
+% cameraFlag = 1; 
 
 if cameraFlag == 1
     pixelSize = 160* 1e-9; % Andor camera
-    % gainFlag = input( '\n ~~~ What is the gain setting (1 or 3, assumed 300x):  ');
-    gainFlag = 3;
+    gainFlag = input( '\n ~~~ What is the gain setting (1 or 3, assumed 300x):  ');
+    % gainFlag = 3;
 
     % sigToPhoton = (2^16-1)* 4.88/  10; % uB, Andor, Gain 3, 10x (SK311, 250710)
     % sigToPhoton = (2^16-1)* 15.3/ 100; % uB, Andor, Gain 1, 100x (SK311, 250628)
@@ -31,15 +31,22 @@ if cameraFlag == 1
         sigToPhoton = (2^16-1)* 15.3/ 300; % uB, Andor, Gain 1, 300x   (~3e3)
     elseif gainFlag == 3    
         sigToPhoton = (2^16-1)* 4.88/ 300; % uB, Andor, Gain 3, 300x   (~1e3, default)
-    elseif gainFlag == 10   
-        sigToPhoton = (2^16-1)* 4.88/  10; % uB, Andor, Gain 3, 10x (SK311, 250710)
+    elseif gainFlag == 30   
+        sigToPhoton = (2^16-1)* 4.88/  30; % uB, Andor, Gain 3, 10x (260311, SK830, Gain 30)
+    elseif gainFlag == 100   
+        sigToPhoton = (2^16-1)* 4.88/  100; % uB, Andor, Gain 3, 10x (260311, SK830, Gain 30)
+    elseif gainFlag == 311
+        % sigToPhoton = (2^16-1)* 4.88/  10; % uB, Andor, Gain 3, 10x (SK311, 250710)
+        sigToPhoton = (2^16-1)* 4.88/  6; % uB, Andor, Gain 3, 10x (260312, SK311, Gain 6)
     else
         sigToPhoton = input( '\n Please input the value manually as (2^16-1)* 4.88/ 300:  ');   
     end
 elseif cameraFlag == 2
     pixelSize = 64.5*10^-9; % Hamamatsu camera
-    fprintf( '\n ~~~ Hama, assumed gain 100x ~~~\n')
-    sigToPhoton = (2^16-1)* 0.275/ (10^( 100/255));  % Hama, Gain 100  (~7e3)
+    % fprintf( '\n ~~~ Hama, assumed gain 100x ~~~\n')
+    % sigToPhoton = (2^16-1)* 0.275/ (10^( 100/255));  % Hama, Gain 100  (~7e3)
+    fprintf( '\n ~~~ Hama, assumed gain 0x ~~~\n')
+    sigToPhoton = (2^16-1)* 0.275;  % Hama, Gain 0  (~1.8e4)
 else        
     error( '\n ~~~ Problematic Camera Info ~~~\n')
 end

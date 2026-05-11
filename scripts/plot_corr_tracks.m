@@ -45,7 +45,8 @@ for j = plotNum
     else, strainName = nameList{ index}; end
     
     % set up figures
-    figure, set( gcf, "Position", [355*c-330 550 350 300])
+    % figure, set( gcf, "Position", [355*c-330 550 350 300])
+    figure, set( gcf, "Position", [405*c-330 550 400 270])
 
     % count spot number for each cell
     cellSpots = accumarray( cellNum(:), 1, [totalCells, 1]);
@@ -105,24 +106,33 @@ for j = plotNum
         % x = abs( xxNorm( cond));    xlabelTxt = '|xNorm|';
         % % x = abs( llNorm( cond)-0.5);    xlabelTxt = '|LNorm-0.5|';
 
-        % % 2. MSD(1) vs. amp
-        % y = tamsd1( cond); ylabelTxt = 'MSD(1) (µm^2)';
-        % x = amp( cond);    xlabelTxt = 'amplitude (a.u.)';
+        % 2. MSD(1) vs. amp
+        y = tamsd1( cond); ylabelTxt = 'MSD(1) (µm^2)';
+        x = amp( cond);    xlabelTxt = 'amplitude (a.u.)';
 
         % % 3. spotNorm vs cellLength
         % x = [ cellInfo( cellNum).length]'*1e6;  xlabelTxt = 'cell length (µm)';
         % y = abs( xxNorm( cond));    ylabelTxt = '|xNorm|';
-        % y = abs( llNorm( cond)-0.5);    ylabelTxt = '|LNorm-0.5|';
+        % % y = abs( llNorm( cond)-0.5);    ylabelTxt = '|LNorm-0.5|';
 
         % % 4. amp vs. spotNorm (no correlation)
         % y = amp( cond);    ylabelTxt = 'amplitude (a.u.)';
         % x = abs( xxNorm( cond));    xlabelTxt = '|xNorm|';
         % % x = abs( llNorm( cond)-0.5);    xlabelTxt = '|LNorm-0.5|';
 
-        % 5. amp vs. trackLength
-        y = amp( cond);    ylabelTxt = 'amplitude (a.u.)';
-        x = tl( cond);    xlabelTxt = 'trackLength';
+        % % 4. spotNorm vs. amp
+        % x = amp( cond);    xlabelTxt = 'amplitude (a.u.)';
+        % y = abs( xxNorm( cond));    ylabelTxt = '|xNorm|';
+        % % y = abs( llNorm( cond)-0.5);    ylabelTxt = '|LNorm-0.5|';
 
+        % % 5. amp vs. trackLength
+        % y = amp( cond);    ylabelTxt = 'amplitude (a.u.)';
+        % x = tl( cond);    xlabelTxt = 'trackLength';
+
+
+        % % 6. amp vs cellLength
+        % x = [ cellInfo( cellNum).length]'*1e6;  xlabelTxt = 'cell length (µm)';
+        % y = amp( cond);    ylabelTxt = 'amplitude (a.u.)';
 
     % plot scatter 
     scatter( x, y, 20, 'filled', 'MarkerFaceAlpha', 0.1, 'DisplayName', legtxt), hold on
@@ -136,7 +146,8 @@ for j = plotNum
     xlabel( xlabelTxt), ylabel( ylabelTxt)
     legend( 'Location', 'northeast', 'box', 'off', 'FontSize', 12)
     title( legtxt2)
-    % xlim( [2 5]), ylim( [0 0.5])
+    % xlim( [2 5]) % LNorm vs. cell length
+    % xlim( [0 0.5]) % for amplitude as x
 end
 
 

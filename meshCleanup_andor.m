@@ -19,14 +19,17 @@ pixel size:     64.5 nm (phase) vs 160 nm (SPT)
 clear, clc, close all
 
 % load oufti mesh output (cell meshes)
-load( 'mesh.mat')
+load( 'phase\mesh.mat')
 
 % elimination criteria
 minArea = 100;  % minimal cell area (pixel)
-maxArea = 200;  % maximal cell area (pixel)
+maxArea = 210;  % maximal cell area (pixel)
 minWid = 6;     % minimal cell width (pixel)
-maxWid = 8.3;   % maximal cell width (pixel)
+maxWid = 8.2;   % maximal cell width (pixel)
 
+% % SK830
+% minArea = 80;  % minimal cell area (pixel)
+% maxArea = 250;  % maximal cell area (pixel)
     
 % set up cell mesh and remove bad cells
 nImg = size( cellListN, 2);

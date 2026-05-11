@@ -20,15 +20,19 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
 
 ### Minor scripts
 
-- `plot_subMSD_cell.m`: plots MSD of subpopulations binned by cell geometry (length/width).
 - `plot_subMSD_spotNorm.m`: plots MSD of subpopulations binned by spotNorm (xNorm/LNorm).
+- `plot_subMSD_cell.m`: plots MSD of subpopulations binned by cell geometry (length/width).
 - `plot_subMSD_amp.m`: plots MSD of subpopulations binned by signal intensity (amplitude).
 - `plot_MSDxy_cell.m`: plots MSD along cellular long & short axes, two plots with multiple dataset overlaid
 - `plot_MSDxy_compare.m`: plots MSD along cellular long & short axes, one plot for each dataset
 - `plot_corr_tracks.m`: plots correlation of any two track quantities using scatter plot.
+  - MSD(1), spotNorm, amp, cellLength, trackLength
 - `plot_MSD_truncate_fit.m`: plot TA-MSD using truncated tracks to compare with conventioanal TA.
-
-
+- `sim_xNorm_loci.m`: simulates and plots xNorm of loci, homogeneous distribution in cylinder.
+- `sim_xNorm_loci_DNAfree.m`: simulates and plots xNorm of loci with a DNA free zone in the middle.
+- `plot_xNorm_with_sim.m`: plots xNorm of loci overlaied with simulated xNorm.
+- `plot_spotNorm_amp.m`: plots spotNorm binned by signal intensity (amplitude).
+  
 ## Before Running the Code
 
 1. Change current working directory to the folder that contains `tracking00x` folders (uTrack output) and `mesha.mat` (oufti output).
@@ -46,13 +50,16 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
    2. all tracking images should be exported into individual subfolder
 3. Transfer the data to the hard drive
 4. Run `lociPrepare_spotNorm.m` to prepare files for oufti & u-track analysis
+   1. this script will create a corresponding folder locally with a same name as the data folder
+   2. this created folder has empty tracking subfolders and a `phase` folder containing tiff images
 5. Run oufti analysis using the parameter file `phase_SPT_alvin.set`
-   1. save the output file `mesh.mat` inside the data folder 
-6. Run u-track analysis using the parameters below
+   1. save the output file `mesh.mat` inside the `phase` folder 
+6. [optional] Run `meshCleanup_andor.m' to clean up the meshes created by oufti
+7. Run u-track analysis using the parameters below
    1. save the output file the same as the input folder (tracking00x)
-7. Run `lociAnalysis_spotNorm.m` to combine oufti & uTrack results, and for further spotNorm & diffusion analysis (results will be saved under the `lociPath`)
-8. Run plotting scripts to visualize the analysis results
-9. (optional) To combine multiple single-day results, run `lociCombine_spotNorm`. It will combined single-day `tf oufti` & `Loci oufti` files and move the individual files to the `single day` subfolder. 
+8. Run `lociAnalysis_spotNorm.m` to combine oufti & uTrack results, and for further spotNorm & diffusion analysis (results will be saved under the `lociPath`)
+9. Run plotting scripts to visualize the analysis results
+10. (optional) To combine multiple single-day results, run `lociCombine_spotNorm`. It will combined single-day `tf oufti` & `Loci oufti` files and move the individual files to the `single day` subfolder. 
 
 ## Analysis Parameters
 
@@ -88,7 +95,8 @@ This is the folder structure after running oufti & u-track analysis. oufti resul
 ├── phase/
 │   ├── epi001.tif
 │   ├── ...
-│   └── epi00x.tif
+│   ├── epi00x.tif
+│   └── mesh.mat
 ├── tracking001/
 │   ├── backups/
 │   ├── TrackingPackage/
@@ -99,6 +107,5 @@ This is the folder structure after running oufti & u-track analysis. oufti resul
 |   └── movieData.mat
 ├── ...
 ├── tracking00x/
-├── mesh.mat
 └── mesha.mat
 ```
