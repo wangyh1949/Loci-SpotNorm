@@ -1,7 +1,7 @@
 %{
 Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 1/11/2026
-    Last update date: 1/11/2026
+    Last update date: 3/26/2026
 
     ~~~~~~~ adapted from combLociTF.m & lociPos_comb.m ~~~~~~~
     ~~~~~~~ adapted from lociAnalysis_spotNorm.m ~~~~~~~
@@ -31,11 +31,11 @@ tfPath   = fullfile( lociPath, 'tracksFinal'); % subfolder under lociPath
 
 
 % find which strain to combine
-strain = getCombStrain( tfPath);
+strain = getCombStrain( lociPath);
 
 % find which files to combine
-tfFile = dir( fullfile( tfPath, ['tf oufti*' strain '*']));
-combNum = getCombNum( tfFile);
+lociFile = dir( fullfile( lociPath, ['Loci oufti*' strain '*']));
+combNum = getCombNum( lociFile);
 
 
 % initialization of combining quantities
@@ -48,18 +48,27 @@ num = [0 0];    c = 0;
 for i = combNum
     
     c = c + 1;
-    % load the tf oufti file
-    tfPath   = fullfile( lociPath, 'tracksFinal'); % subfolder under lociPath
-    load( fullfile( tfPath, tfFile(i).name)),  fprintf( '    ~~~ %s loaded ~~~\n', tfName)
+    % load file info from loci file
+    load( fullfile( lociPath, lociFile(i).name))
 
-    lociName = [ 'Loci oufti ' strain ' ' expDate extraName];
-    
+    tfNameFull = [tfName '.mat'];
+    tfFile = fullfile(tfPath, tfNameFull);
+    if ~isfile(tfFile)
+        tfFile = fullfile(tfPath, 'single day', tfNameFull);
+    end
+    if ~isfile(tfFile)
+        error('   No corresponding ''tf oufti'' file found for %s\n', lociFile(i).name)
+    end
+
+    % load the corresponding trackFinal file
+    load( tfFile),  fprintf( '    ~~~ %s loaded ~~~\n', tfName)
+       
     % combine the tf
     tfComb{ c} = tracksFinal;
     cellMesh{ c} = cellMeshAll;
     cellRec{ c} = cellRecord;
 
-    nTracks = size( tracksFinal, 1);
+    nTracks = numel( tracksFinal);
     num = num(2) + [1 nTracks]; % record the track numbers from each movies
     
     % record all info into a single cell variable
@@ -79,16 +88,16 @@ fprintf( '\n~~~~~~~ tracksFinal Combination Finished ~~~~~~~\n');
 
 lociPath = fullfile( varPath, 'Loci SpotNorm'); % subfolder under varPath
 tfPath   = fullfile( lociPath, 'tracksFinal'); % subfolder under lociPath
-
+%%
 % get experimental info
 expDate = input( '\nWhat is the combDate ( like ''240610 comb''):  ', 's');
 
 % save tracksFinal files
 tfName = ['tf oufti ' strain ' ' expDate extraName];
 
-save( fullfile( tfPath, tfName), 'varPath', 'lociPath', 'dataPath', 'imgPath', 'tracksFinal', ...
+save( fullfile( tfPath, tfName), 'varPath', 'lociPath', 'tracksFinal', ...
     'cellMeshAll', 'cellRecord', 'cameraFlag', 'pixelSize', 'sigToPhoton', ...
-    'combRec', 'folderName', 'expDate', 'strain', 'extraName', 'tfPath', 'tfName')
+    'combRec', 'expDate', 'strain', 'extraName', 'tfPath', 'tfName')
 
 fprintf( '\n ~~~ tracksFinal:  %s saved  under  ''tfPath'' ~~~\n\n', tfName)
 
@@ -103,18 +112,32 @@ lociDstFolder = fullfile( lociPath, 'single day');
 if ~exist( tfDstFolder, 'dir'), mkdir(tfDstFolder); end
 if ~exist( lociDstFolder, 'dir'), mkdir(lociDstFolder); end
 
-files = tfFile( combNum);
+files = lociFile( combNum);
 
-for k = 1: numel( files)
-    % move tf files into subfolder
-    movefile( fullfile( tfPath, files(k).name), tfDstFolder)
-    fprintf( '   ''%s'' moved to ''tfPath\\single day'' folder \n', files(k).name)
-    
+for k = 1: length( files)
+
     % move loci files into subfolder
-    lociFileName = [ combRec{k,4} '.mat'];
-    movefile( fullfile( lociPath, lociFileName), lociDstFolder)
-    fprintf( '   ''%s'' moved to ''lociPath\\single day'' folder \n\n', lociFileName)    
+    srcFile = fullfile( lociPath, files(k).name);    
+    if isfile(srcFile)
+        movefile( srcFile, lociDstFolder);
+        fprintf("   '%s' moved to 'lociPath\\single day' folder\n", files(k).name);
+    else
+        warning("   WARNING: '%s' does not exist. Skipping.\n", files(k).name);
+    end
+    
+    % move tf files into subfolder
+    tfFileName = [ combRec{k,3} '.mat'];
+    srcFile = fullfile( tfPath, tfFileName);
+    if isfile(srcFile)
+        movefile( srcFile, tfDstFolder);
+        fprintf( '   ''%s'' moved to ''tfPath\\single day'' folder \n\n', tfFileName)   
+    else
+        warning("   WARNING: '%s' does not exist. Skipping.\n", tfFileName);
+    end
 end
+
+
+fprintf( '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n')
 
 
 %% 3. Diffusion analysis
@@ -241,9 +264,9 @@ fprintf( ' ~~~ Loci file:  %s saved under  ''lociPath'' ~~~\n\n', lociName)
 %% 4. Display analysis result summary
 
 fprintf( ['\n ~~~~~~ %s Analysis Result ~~~~~~\n' ...
-    '    %d total cells,  %d/%d valid tracks\n'...
+    '    %d movies,  %d total cells,  %d/%d valid tracks\n'...
     '    %d tracks (1st spot),  %d tracks (first 40 spots)    not in cap region \n'],...
-    folderName, totalCells, sum( ~isnan( tracksxNorm(:,1))), nTracks, ...
+    folderName, length( cellRecord), totalCells, sum( ~isnan( tracksxNorm(:,1))), nTracks, ...
     sum( tracksMid(:,1)), sum( min( tracksMid40, [], 2)))
     
 % disp( cellRecord)
@@ -252,30 +275,33 @@ fprintf( ['\n ~~~~~~ %s Analysis Result ~~~~~~\n' ...
 
 %% Function
 
-function strain = getCombStrain( tfPath)
+function strain = getCombStrain( lociPath)
 
     % list all available strains for combination
-    files = dir( fullfile( tfPath, 'tf oufti*'));
+    files = dir( fullfile( lociPath, 'Loci*'));
     names = { files.name};
-    tokens = regexp( names, 'SK\d+', 'match');
-    strainList = [ tokens{:}];
-    SKlist = unique( strainList);
     
-    listN = length( SKlist); 
+    tokens = regexp( names, 'SK\d+', 'match');
+    SKlist = unique( [ tokens{:}]);
+    
+    listN = numel( SKlist); 
+
     if listN == 0
         error('   No strain is found in the current directory \n')
-    else
-        fprintf( '\n~~~~~ There are %d strains ~~~~~\n', listN)
-        for k = 1: listN
-            fprintf( '    -  %s\n', SKlist{k})
-        end
-        % find which strain to combine
-        tmp = input( '  Which strain do you want to combine? (e.g. ''SK662'')  ', 's');
-        strainNum = strcmp( tmp, SKlist);
-        if sum( strainNum) ~= 1
-            error( '   ~~~~~ No strain found for input ~~~~~\n')
-        else
-            strain = SKlist{ strainNum};
-        end
     end
+
+    fprintf( '\n~~~~~ %d strains found ~~~~~\n', listN)
+    for k = 1: listN
+        fprintf('%6d. %s\n', k, SKlist{k});
+    end
+
+    % Ask user for numeric selection
+    idx = input(sprintf('  Select strain to combine (1-%d): ', listN));
+
+    % Validate input
+    if isempty(idx) || ~isscalar(idx) || idx < 1 || idx > listN || idx ~= floor(idx)
+        error('Invalid selection.')
+    end
+    
+    strain = SKlist{ idx};
 end
