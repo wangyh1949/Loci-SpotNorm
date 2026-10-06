@@ -2,12 +2,16 @@
 ---------------------------------------------------------------------------
 Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 3/27/2026
-    Last update date: 7/14/2026
+    Last update date: 6/9/2026
 
-~~~~~~~~~~~ adapted from plot_spotNorm.m & plot_subMSD_amp.m ~~~~~~~~~~~
+    ~~~~~~~ adapted from plot_spotNorm_amp.m ~~~~~~~
+
 
 Description: This script plot xNorm & lNorm for loci tracking data binned
-by signal amplitude
+by Dα.
+
+this script was originally for studying how xNorm varies with Dα for 
+    SK727 staPh loci tracking data
 ---------------------------------------------------------------------------
 %}
 
@@ -29,7 +33,7 @@ nameList = { 'araC' 'Ter' 'Ori' 'Right' 'Left' '12tetO@LacZ' ... 'LacZ'...
     '6tetO@LacY' '6tetO@lacZ' '140tetO pJZ133' '140tetO@lacZ' 'sal'};
 
 
-xNormBin = 0.04; lNormBin = 0.01; % for spotNorm plotting for all timePoints
+xNormBin = 0.04; lNormBin = 0.02; % for spotNorm plotting for all timePoints
 
 cc = 0;
 for j = plotNum
@@ -51,7 +55,9 @@ for j = plotNum
         tInt = findInt( extraName, expDate, strain);
         extraName = erase( extraName, [ ' ' tInt]);
         expDate = erase( expDate, ' comb');
-
+   
+    legtxt = sprintf( '%s, %s%s', strain, strainName, extraName);
+    legtxt2 = sprintf( '%s-%s %s%s', expDate, strain, strainName, extraName);
 
     % count spot number for each cell
     cellSpots = accumarray( cellNum(:), 1, [totalCells, 1]);
@@ -67,27 +73,26 @@ for j = plotNum
     condxNorm = min( mid40, [], 2); % exclude tracks with any cap points
     condSpots = ismember( cellNum, goodCells); % flag for spots in selected cells
 
-    cond = condSpots & condxNorm; % flag for tracks with selected spots and good xNorm
+    cond = condSpots;% & condxNorm; % flag for tracks with selected spots and good xNorm
 
     xxNorm = tracksxNorm( cond, 1);   xNorm40 = tracksxNorm40( cond,:);
     llNorm = tracksLNorm( cond, 1);   lNorm40 = tracksLNorm40( cond,:);
     % tracksMid: [first spot, whole track]
     
+    % tracksDiff: diff (um^2/s), locErr (nm), alpha, dalpha (um^2/s)
+    % Diff = tracksDiff( longT, 1);
 
-    % divide data by signal amplitude
-    if ~exist( 'tracksSig', 'var')
-        sigFactor = 1; % if no signal info, just use amplitude
-    else
-        sigFactor = tracksSig( cond); % use signal at first frame for binning
-    end
-    binData = tracksAmp( cond,1).* sigFactor;  binName = 'amp'; % use amplitude at first frame for binning
+    % binData = tracksAmp( cond,1).* sigFactor;  binName = 'amp'; % use amplitude at first frame for binning
     % binData = mean(tracksAmp(:,1:40), 2);  binName = 'amp40'; % use average amplitude of first 40 frames for binning
+    binData = Dalpha( cond);    binName = 'Dα';
 
     binPer = [0 0.1 0.3 0.5 0.7 0.9 1]; % binning percentage
     binPer = [0 0.05 0.1 0.4 0.8 1]; % SK830    
-    binPer = [0 0.1:0.2:0.9 1]; % for other strain
+    binPer = [0 0.05 0.1 0.15 0.25 0.4 0.6 0.8 1]; % SK830
+    % binPer = [0 0.12 0.25 0.6 1]; % SK830
+    % binPer = [0 0.1:0.2:0.9 1]; % for other strain
     % binPer = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]; % SK830
-    binPer = [0 0.02 0.05 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]; % SK830
+    % binPer = [0 0.02 0.05 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]; % SK830
     binList = quantile( binData, binPer); 
     colorList = flip( winter( numel( binPer))); c = 0; 
                 
@@ -95,18 +100,19 @@ for j = plotNum
         fprintf( '  ~~~ %3d images, %4d cells, %5d/%5d tracks,  %5d spots,  <xNorm> = %.3f    %s-%s%s\n',...
             size( cellRecord, 1), sum( cellSpots > 0), sum( cond), nTracks, numel( xxNorm),...
             mean( xxNorm(:), 'omitnan'), expDate, strain, extraName)
-
-
+    
+    
     % 1. plot intensity distribution
-    figure( f3)
+    figure( f1)
     histogram( log( binData), 50, ... 'binWidth', 0.01,
         'EdgeColor', 'none', 'FaceAlpha', 0.5)
     xline( log( binList(2:end-1)), 'Color', [1 1 1]*0.4, 'LineWidth', 0.8)
 
         % figure setting
         set( gca, 'LineWidth', 1, 'FontSize', 14)
-        xlabel( 'log(Intensity) (a.u.)'), ylabel( 'Counts')
-        title( 'Signal Intensity')
+        xlabel( 'log(Dα)'), ylabel( 'Counts')
+        title( 'Diffusion Coefficient'), box off
+        title( legtxt2)
         % xlim( [3 10]) % SK830
 
 
@@ -127,7 +133,7 @@ for j = plotNum
 
 
         % 1. plot abs( xNorm)
-        figure(f1), hold on
+        figure(f2), hold on
         % [~, edges] = histcounts( xxNorm, 'BinWidth', xNormBin, 'BinLimits', [0 1], 'Normalization', 'probability');
         %     tmp = movmean( edges, 2);   centers = tmp( 2:end);
         % errorbar( centers, mean( mX), std( mX), 'LineWidth', 2.5, 'DisplayName', legtxt, 'Color', colorList(c,:)), hold on
@@ -137,7 +143,7 @@ for j = plotNum
 
 
         % 2. plot lNorm
-        figure(f2), hold on
+        figure(f3), hold on
         [N, edges] = histcounts( abs( 0.5-lNorm), 'BinWidth', lNormBin, 'BinLimits', [0 0.5], 'Normalization', 'probability');
         % [N, edges] = histcounts( lNorm, 'BinWidth', lNormBin, 'BinLimits', [0 1], 'Normalization', 'probability');
             tmp = movmean( edges, 2);   centers = tmp( 2:end);
@@ -147,24 +153,23 @@ for j = plotNum
 
     
     %% figure setting
-    titletxt = sprintf( '%s, %s%s', strain, strainName, extraName);
 
     % xNorm
-    figure(f1)
+    figure(f2)
     set( gca, 'FontSize', 14, 'Xtick', 0:0.2:1, 'LineWidth', 1)
     xlabel([ '|xNorm|, bin=' num2str( xNormBin)]), ylabel( 'Probability')
-    title( titletxt)
+    title( legtxt)
     legend( 'Location', 'northeast', 'box', 'off', 'FontSize', 11)
-    ylim( [0 0.15])
+    % ylim( [0 0.2])
 
     % lNorm
-    figure(f2)
+    figure(f3)
     set( gca, 'FontSize', 14, 'Xtick', 0:0.2:1, 'LineWidth', 1)
     xlabel([ '|0.5-LNorm|, bin=' num2str( lNormBin)]), ylabel( 'Probability')
     % xlabel([ 'LNorm, bin=' num2str( lNormBin)]), ylabel( 'Probability')
     legend( 'Location', 'northeast', 'box', 'off', 'FontSize', 11)
     % legend( 'Location', 'best', 'box', 'off', 'FontSize', 12)
-    title( titletxt)
+    title( legtxt)
     xlim([0 0.5])
     % grid on
 end

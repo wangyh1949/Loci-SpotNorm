@@ -8,7 +8,8 @@ Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
 ~~~~~~~~~~ adapted from spotNorm_yh.m ~~~~~~~~~~~
 
 this version is for loci tracking data with phase contrast images,
-shiftback module is deleted
+auto shiftback module is deleted (the previous method is based on mostly
+ filled cells for SPT, doesn't work well with loci data)
 
 Description: spotNorm_loci.m is a script that combine oufti mesh files &
 uTrack tracking outputs and align them together. The fluorescent signals

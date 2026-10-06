@@ -1,7 +1,7 @@
 %{
 Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 1/11/2026
-    Last update date: 3/26/2026
+    Last update date: 5/20/2026
 
     ~~~~~~~ adapted from combLociTF.m & lociPos_comb.m ~~~~~~~
     ~~~~~~~ adapted from lociAnalysis_spotNorm.m ~~~~~~~
@@ -88,10 +88,18 @@ fprintf( '\n~~~~~~~ tracksFinal Combination Finished ~~~~~~~\n');
 
 lociPath = fullfile( varPath, 'Loci SpotNorm'); % subfolder under varPath
 tfPath   = fullfile( lociPath, 'tracksFinal'); % subfolder under lociPath
-%%
+
 % get experimental info
 expDate = input( '\nWhat is the combDate ( like ''240610 comb''):  ', 's');
 
+% double check if extraName is correct, if not, ask for the correct one
+fprintf( '\n ~~~~~~ extraName:  ''%s''  ~~~~~~\n', extraName)
+extraNameFlag = input( '\nIs the extraName correct? (y/n):  ', 's');
+if strcmpi( extraNameFlag, 'n')
+    extraName = [ ' ' input( '\nplease input the correct one (like ''20-200ms''):  ', 's')];
+end
+
+%%
 % save tracksFinal files
 tfName = ['tf oufti ' strain ' ' expDate extraName];
 
@@ -161,7 +169,17 @@ EnsMSD = nan( nTracks, maxT-1);     EnsTAMSD = nan( nTracks, maxT-1);
 alpha = nan( nTracks, 1);           Dalpha = nan( nTracks, 1);
 posStd = nan( nTracks, 1);          tracksAmp = nan( nTracks, maxT);
 
-origin = unique( [tracksFinal.origin])';    
+origin = unique( [tracksFinal.origin], 'stable')';  
+
+% assign sigToPhoton factor for each track based on the corresponding combined individual file
+% combRec{c} = { dataPath, folderName, tfName, lociName, sigToPhoton, num};
+tracksSig = nan( nTracks, 1);
+sigNum = cell2mat( combRec(:,6)); % track number range for each combined individual, e.g. [1 100; 101 200; ...]
+sigFac = cell2mat( combRec(:,5)); % sigToPhoton factor for each combined individual
+for i = 1: size( combRec, 1)
+    % assign the same sigToPhoton factor to all tracks from the same combined individual
+    tracksSig( sigNum( i, 1): sigNum( i, 2)) = sigFac( i);
+end
 
 for i = 1: nTracks
     
@@ -242,19 +260,23 @@ tracksMid(:, 1) = LNorm(:,1) > bound & LNorm(:,1) < 1-bound; % first spot not at
 tracksMid(:, 2) = LNorm(:,3) > bound & LNorm(:,4) < 1-bound; % whole track not at pole
 
 tracksMid40 = tracksLNorm40 > bound & tracksLNorm40 < 1-bound;
-
+%%
 % save variables for plotting, tracksFinal not saved (save space)
 lociName = [ 'Loci oufti ' strain ' ' expDate extraName];
 
-save( fullfile( lociPath, lociName), 'varPath', 'lociPath', 'dataPath', 'imgPath', ...
+
+save( fullfile( tfPath, tfName), 'varPath', 'lociPath', 'tracksFinal', ...
+    'cellMeshAll', 'cellRecord', 'cameraFlag', 'pixelSize', 'sigToPhoton', ...
+    'combRec', 'expDate', 'strain', 'extraName', 'tfPath', 'tfName')
+
+save( fullfile( lociPath, lociName), 'varPath', 'lociPath', ...
     'cellRecord', 'cameraFlag', 'pixelSize', 'sigToPhoton', ...
     'maxT', 'timeStep', 'cellNum', 'totalCells', ...
     'nTracks', 'EnsMSD', 'EnsTAMSD', 'fitTxt', 'alpha', 'Dalpha', 'posStd', ...
-    'tracksAmp', 'tracksOrigin', 'tracksLength', 'tracksFrame', ...% 'steps', ...    
+    'tracksSig', 'tracksAmp', 'tracksOrigin', 'tracksLength', 'tracksFrame', ...% 'steps', ...    
     'cellInfo', 'poleBounds', 'tracksLNorm', 'tracksxNorm', 'tracksMid', ...
     'tracksLNorm40', 'tracksxNorm40', 'tracksMid40', ...
-    'combRec', 'folderName', 'expDate', 'strain', 'extraName', 'tfPath', 'tfName', 'lociName')
-
+    'combRec', 'expDate', 'strain', 'extraName', 'tfPath', 'tfName', 'lociName')
 
 fprintf( ' ~~~ Loci file:  %s saved under  ''lociPath'' ~~~\n\n', lociName)
 

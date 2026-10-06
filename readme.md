@@ -16,29 +16,29 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
 - `meshCleanup_andor.m`: cleans up the cell meshes with abnormal cell size and shape.
 - `plot_spotNorm.m`: plots xNorm & lNorm from the data.
 - `plot_MSD_fit.m`: plots MSD & fitting of the tracking data.
-- `plot_all.m`: plot basic properties of the data: track length, MSD, bleaching, D & alpha & locErr histogram.
+- `plot_all.m`: plots basic properties of the data: track length, MSD, bleaching, D & alpha & locErr histogram.
 
 ### Minor scripts
 
-- `plot_subMSD_spotNorm.m`: plots MSD of subpopulations binned by spotNorm (xNorm/LNorm).
+- `plot_subMSD_spotNorm.m`: plots MSD of subpopulations binned by spotNorm percentage (xNorm/LNorm).
+- `plot_subMSD_spotNorm_absolute.m`: plots MSD of subpopulations binned by absolute spotNorm value.
 - `plot_subMSD_cell.m`: plots MSD of subpopulations binned by cell geometry (length/width).
 - `plot_subMSD_amp.m`: plots MSD of subpopulations binned by signal intensity (amplitude).
+- `plot_subMSD_diff.m`: plots MSD of subpopulations binned by D coefficient (Dα).
 - `plot_MSDxy_cell.m`: plots MSD along cellular long & short axes, two plots with multiple dataset overlaid
 - `plot_MSDxy_compare.m`: plots MSD along cellular long & short axes, one plot for each dataset
 - `plot_corr_tracks.m`: plots correlation of any two track quantities using scatter plot.
   - MSD(1), spotNorm, amp, cellLength, trackLength
-- `plot_MSD_truncate_fit.m`: plot TA-MSD using truncated tracks to compare with conventioanal TA.
+- `plot_MSD_truncate_fit.m`: plot TA-MSD using truncated tracks to compare with conventional TA.
 - `sim_xNorm_loci.m`: simulates and plots xNorm of loci, homogeneous distribution in cylinder.
 - `sim_xNorm_loci_DNAfree.m`: simulates and plots xNorm of loci with a DNA free zone in the middle.
-- `plot_xNorm_with_sim.m`: plots xNorm of loci overlaied with simulated xNorm.
+- `plot_xNorm_with_sim.m`: plots xNorm of loci overlaid with simulated xNorm.
 - `plot_spotNorm_amp.m`: plots spotNorm binned by signal intensity (amplitude).
+- `plot_spotNorm_diff.m`: plots spotNorm binned by D coefficient (Dα).
+- `plot_spotNorm_cellLength.m`: plots spotNorm binned by cell length.
+- `plot_cell_diff.m`: plots cell with & length binned by D coefficient (Dα).
+- `plot_cell_geometry.m`: plots cell width & length distribution in horizontal raincloud plots.
   
-## Before Running the Code
-
-1. Change current working directory to the folder that contains `tracking00x` folders (uTrack output) and `mesha.mat` (oufti output).
-2. Always change `varPath` in the code to your own local folder to store analysis results (all results will be saved under the `lociPath`).
-3. Make sure the oufti output file `mesh.mat` is cleaned up and saved as `mesha.mat`.
-
 ## Running workflow
 
 1. When capturing images using the NIS Element, follow naming rules
@@ -54,12 +54,15 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
    2. this created folder has empty tracking subfolders and a `phase` folder containing tiff images
 5. Run oufti analysis using the parameter file `phase_SPT_alvin.set`
    1. save the output file `mesh.mat` inside the `phase` folder 
-6. [optional] Run `meshCleanup_andor.m' to clean up the meshes created by oufti
+6. [optional] Run `meshCleanup_andor.m` to clean up the meshes created by oufti
 7. Run u-track analysis using the parameters below
    1. save the output file the same as the input folder (tracking00x)
 8. Run `lociAnalysis_spotNorm.m` to combine oufti & uTrack results, and for further spotNorm & diffusion analysis (results will be saved under the `lociPath`)
-9. Run plotting scripts to visualize the analysis results
-10. (optional) To combine multiple single-day results, run `lociCombine_spotNorm`. It will combined single-day `tf oufti` & `Loci oufti` files and move the individual files to the `single day` subfolder. 
+   1. Change current working directory to the folder that contains `tracking00x` folders (uTrack output) and `mesha.mat` (oufti output).
+   2. Always change `varPath` in the code to your own local folder to store analysis results (all results will be saved under the `lociPath`).
+   3. Make sure the oufti output file `mesh.mat` is cleaned up and saved as `mesha.mat` in the save folder.
+1.  Run plotting scripts to visualize the analysis results
+2.  (optional) To combine multiple single-day results, run `lociCombine_spotNorm`. It will combined single-day `tf oufti` & `Loci oufti` files and move the individual files to the `single day` subfolder. 
 
 ## Analysis Parameters
 
@@ -67,7 +70,7 @@ All images are taken using microscope B, PC lens (NA=1.45, 100x), Andor camera (
 
 - std = 1 pix, alpha = 0.01, alpha = 0.01
 - frame 0 gap, 40+ frame
-- 20ms exposure, 200ms interval, search radius = 2 pix
+- 20ms exposure, 200ms interval, search radius = 3 pix
 
 ### oufti analysis
 
@@ -96,7 +99,8 @@ This is the folder structure after running oufti & u-track analysis. oufti resul
 │   ├── epi001.tif
 │   ├── ...
 │   ├── epi00x.tif
-│   └── mesh.mat
+│   ├── mesh.mat
+│   └── mesha.mat
 ├── tracking001/
 │   ├── backups/
 │   ├── TrackingPackage/
@@ -106,6 +110,4 @@ This is the folder structure after running oufti & u-track analysis. oufti resul
 |           └── Channel_1_tracking_result.mat
 |   └── movieData.mat
 ├── ...
-├── tracking00x/
-└── mesha.mat
-```
+└── tracking00x/

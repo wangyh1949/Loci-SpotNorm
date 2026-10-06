@@ -72,7 +72,7 @@ dataPath = pwd; % current folder with raw uTrack & oufti output
     imgPath = phaseList(1).folder;
 
     % load oufti mesh file
-    tmp = 'mesha.mat'; % contains oufti results for all PC images
+    tmp = fullfile( 'phase', 'mesha.mat'); % contains oufti results for all PC images
     if isfile( tmp)
         load( tmp, 'cellList', 'cellListN')
     else 
@@ -291,7 +291,7 @@ fprintf( ['\n ~~~~~~ %s Analysis Result ~~~~~~\n' ...
     '    %d tracks (1st spot),  %d tracks (first 40 spots)    not in cap region \n'],...
     folderName, totalCells, sum( ~isnan( tracksxNorm(:,1))), nTracks, ...
     sum( tracksMid(:,1)), sum( min( tracksMid40, [], 2)))
-    
+
 % disp( cellRecord)
 
 

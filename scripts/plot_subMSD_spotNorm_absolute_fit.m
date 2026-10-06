@@ -56,7 +56,7 @@ for j = plotNum
     cond = ( tl>= minTL) & frame(:,1) == 1;
     % cond = ( tl>= minTL);
     
-    fprintf( '   plotting tracks with %d+ frames,  %d/%d tracks    %s\n\n', ...
+    fprintf( '\n   plotting tracks with %d+ frames,  %d/%d tracks    %s\n', ...
         minTL, sum( cond), nTracks, lociName)
     
         maxTau = size( EnsMSD, 2);

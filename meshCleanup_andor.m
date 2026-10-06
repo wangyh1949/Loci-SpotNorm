@@ -9,6 +9,9 @@ Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
 this script is for cleaning the mesh data, delete problematic cells after
 oufti automatic cell outline detection
 
+Input: mesh.mat file from oufti output (cell meshes)
+Output: mesha.mat file with cleaned cell meshes (under the same folder 'phase')
+
 this version is specifically for phase images taken with SPT lens
 (loci tracking experiments with phase images)
 
@@ -21,11 +24,18 @@ clear, clc, close all
 % load oufti mesh output (cell meshes)
 load( 'phase\mesh.mat')
 
-% elimination criteria
+% elimination criteria (adjust accordingly)
 minArea = 100;  % minimal cell area (pixel)
 maxArea = 210;  % maximal cell area (pixel)
 minWid = 6;     % minimal cell width (pixel)
 maxWid = 8.2;   % maximal cell width (pixel)
+
+% SK654
+% maxArea = 240;  % maximal cell area (pixel)
+
+% % SK727 staPh (relatively small)
+% minArea = 80;  % minimal cell area (pixel)
+% maxArea = 180;  % maximal cell area (pixel)
 
 % % SK830
 % minArea = 80;  % minimal cell area (pixel)
@@ -133,7 +143,7 @@ end
 cellListN = cellfun( @length, cellList.cellId);         
     
 % save as mesha.mat file
-save( 'mesha', 'p', 'rawPhaseFolder', 'cellList', 'cellListN', 'paramString', 'cellAll')
+save( fullfile( 'phase', 'mesha'), 'p', 'rawPhaseFolder', 'cellList', 'cellListN', 'paramString', 'cellAll')
 
 fprintf( '\n~~~~~~ all images cleanup done,  %d/%d cells are cleaned ~~~~~~\n\n', badCellsTotal, totalCells)
 

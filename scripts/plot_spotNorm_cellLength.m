@@ -2,12 +2,13 @@
 ---------------------------------------------------------------------------
 Author: Yu-Huan Wang (Kim Lab at UIUC) - yuhuanw2@illinois.edu
     Creation date: 3/27/2026
-    Last update date: 7/14/2026
+    Last update date: 6/9/2026
 
-~~~~~~~~~~~ adapted from plot_spotNorm.m & plot_subMSD_amp.m ~~~~~~~~~~~
+    ~~~~~~~ adapted from plot_spotNorm_diff.m ~~~~~~~
 
 Description: This script plot xNorm & lNorm for loci tracking data binned
-by signal amplitude
+by cell length.
+
 ---------------------------------------------------------------------------
 %}
 
@@ -29,16 +30,16 @@ nameList = { 'araC' 'Ter' 'Ori' 'Right' 'Left' '12tetO@LacZ' ... 'LacZ'...
     '6tetO@LacY' '6tetO@lacZ' '140tetO pJZ133' '140tetO@lacZ' 'sal'};
 
 
-xNormBin = 0.04; lNormBin = 0.01; % for spotNorm plotting for all timePoints
+xNormBin = 0.04; lNormBin = 0.02; % for spotNorm plotting for all timePoints
 
 cc = 0;
 for j = plotNum
     
     cc = cc + 1;
     % set up figures for each strain
-    f1 = figure( 'Position', [400+20*cc 500+20*cc 400 370]); % for xNorm
-    f2 = figure( 'Position', [810+20*cc 500+20*cc 400 370]); % for LNorm
-    f3 = figure( 'Position', [1220+20*cc 500+20*cc 400 370]);
+    f3 = figure( 'Position', [400+20*cc 500+20*cc 400 370]); % for xNorm
+    f1 = figure( 'Position', [810+20*cc 500+20*cc 400 370]); % for LNorm
+    f2 = figure( 'Position', [1220+20*cc 500+20*cc 400 370]);
     
     % load lociPos file
     load( fullfile( lociList( j).folder, lociList( j).name))
@@ -52,6 +53,7 @@ for j = plotNum
         extraName = erase( extraName, [ ' ' tInt]);
         expDate = erase( expDate, ' comb');
 
+    titletxt = sprintf( '%s, %s%s', strain, strainName, extraName);
 
     % count spot number for each cell
     cellSpots = accumarray( cellNum(:), 1, [totalCells, 1]);
@@ -67,27 +69,31 @@ for j = plotNum
     condxNorm = min( mid40, [], 2); % exclude tracks with any cap points
     condSpots = ismember( cellNum, goodCells); % flag for spots in selected cells
 
-    cond = condSpots & condxNorm; % flag for tracks with selected spots and good xNorm
+    cond = condSpots;% & condxNorm; % flag for tracks with selected spots and good xNorm
 
     xxNorm = tracksxNorm( cond, 1);   xNorm40 = tracksxNorm40( cond,:);
     llNorm = tracksLNorm( cond, 1);   lNorm40 = tracksLNorm40( cond,:);
     % tracksMid: [first spot, whole track]
     
+    % tracksDiff: diff (um^2/s), locErr (nm), alpha, dalpha (um^2/s)
+    % Diff = tracksDiff( longT, 1);
 
-    % divide data by signal amplitude
-    if ~exist( 'tracksSig', 'var')
-        sigFactor = 1; % if no signal info, just use amplitude
-    else
-        sigFactor = tracksSig( cond); % use signal at first frame for binning
-    end
-    binData = tracksAmp( cond,1).* sigFactor;  binName = 'amp'; % use amplitude at first frame for binning
+    % binData = tracksAmp( cond,1).* sigFactor;  binName = 'amp'; % use amplitude at first frame for binning
     % binData = mean(tracksAmp(:,1:40), 2);  binName = 'amp40'; % use average amplitude of first 40 frames for binning
+    
+    cellLength = [cellInfo( cellNum).length]'* 1e6;
+    cellWidth = [cellInfo( cellNum).width]'* 1e6;
 
-    binPer = [0 0.1 0.3 0.5 0.7 0.9 1]; % binning percentage
-    binPer = [0 0.05 0.1 0.4 0.8 1]; % SK830    
-    binPer = [0 0.1:0.2:0.9 1]; % for other strain
+    binData = cellLength( cond);    binName = 'cLen';
+    % binData = cellWidth( cond);    binName = 'cWid';
+
+    % binPer = [0 0.1 0.3 0.5 0.7 0.9 1]; % binning percentage
+    % binPer = [0 0.05 0.1 0.4 0.8 1]; % SK830    
+    % binPer = [0 0.05 0.1 0.15 0.25 0.4 0.6 0.8 1]; % SK830
+    % binPer = [0 0.12 0.25 0.6 1]; % SK830
+    binPer = [0:0.2:1]; % for other strain
     % binPer = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]; % SK830
-    binPer = [0 0.02 0.05 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]; % SK830
+    % binPer = [0 0.02 0.05 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]; % SK830
     binList = quantile( binData, binPer); 
     colorList = flip( winter( numel( binPer))); c = 0; 
                 
@@ -99,15 +105,15 @@ for j = plotNum
 
     % 1. plot intensity distribution
     figure( f3)
-    histogram( log( binData), 50, ... 'binWidth', 0.01,
+    histogram( ( binData), 50, ... 'binWidth', 0.01,
         'EdgeColor', 'none', 'FaceAlpha', 0.5)
-    xline( log( binList(2:end-1)), 'Color', [1 1 1]*0.4, 'LineWidth', 0.8)
+    xline( ( binList(2:end-1)), 'Color', [1 1 1]*0.4, 'LineWidth', 0.8)
 
         % figure setting
         set( gca, 'LineWidth', 1, 'FontSize', 14)
-        xlabel( 'log(Intensity) (a.u.)'), ylabel( 'Counts')
-        title( 'Signal Intensity')
-        % xlim( [3 10]) % SK830
+        xlabel( sprintf( '%s (µm)', binName))
+        ylabel( 'Counts'), box off
+        title( titletxt)
 
 
     for k = 1: numel( binList)- 1
@@ -147,7 +153,6 @@ for j = plotNum
 
     
     %% figure setting
-    titletxt = sprintf( '%s, %s%s', strain, strainName, extraName);
 
     % xNorm
     figure(f1)
@@ -155,7 +160,7 @@ for j = plotNum
     xlabel([ '|xNorm|, bin=' num2str( xNormBin)]), ylabel( 'Probability')
     title( titletxt)
     legend( 'Location', 'northeast', 'box', 'off', 'FontSize', 11)
-    ylim( [0 0.15])
+    % ylim( [0 0.2])
 
     % lNorm
     figure(f2)
